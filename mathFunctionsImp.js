@@ -256,4 +256,43 @@ function randomFunctionArray() {
   return array;
 }
 
+function simpify(expression) {
+
+  let simplified = expression;
+
+  let coefsOfX = getPolynomialWithX(expression).cObj.coef;
+  let powersOfX = getPolynomialWithX(expression).pObj.powers;
+  let signsOfX = getPolynomialWithX(expression).sObj.signs; // passes no sign as ''
+  let numbers = getNumbers(expression).nObj.numbers;
+  let signsOfNumbers = getNumbers(expression).sObj.signs; // passes no sign as ''
+
+  signsOfX = processSigns(signsOfX);
+  signsOfNumbers = processSigns(signsOfNumbers);
+
+  let sumUp = 0;
+
+  for (let i = 0; i < powersOfX.length; i++) {
+    for (let j = i + 1; j < powers.length; j++) {
+      if (isTheSamePower(Number(powersOfX[i]), Number(powersOfX[j]))) {
+        // sumUp = Number(coefsOfX[j]) + Number(coefsOfX[i]);
+          simplified = simplified.replace()
+      }
+    }
+  }
+
+}
+
+function processSigns(signs) {
+  for (let i = 0; i < signs.length; i++) {
+    if (signs[i] == '') signs[i] = '+';
+    signs[i] = signs[i].toString().trim(); 
+  }
+  return signs
+}
+
+function isTheSamePower(pow1, pow2) {
+  if (var1 == var2) return true;
+  else return false;
+} 
+
 console.log(randomFunctionArray());
