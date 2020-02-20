@@ -32,6 +32,7 @@ function derive(expression) {
 
         derivedPower = powers[i] - 1;
         derivedCoef = (coefs[i] * powers[i]);
+        console.log(derivedCoef);
 
         switch (derivedPower) {
             case 0:
@@ -40,10 +41,15 @@ function derive(expression) {
             case 1:
                 if (derivedCoef == 1) {
                     derivedExpressionArray[i] = signs[i] + "x";
-                } else derivedExpressionArray[i] = signs[i] + derivedCoef + "x";
+                } else {
+                    derivedExpressionArray[i] = signs[i] + derivedCoef + "x";
+                    console.log(derivedExpressionArray[i]);
+                }
                 break;
             default:
-                derivedExpressionArray[i] = signs[i] + derivedCoef + "x^" + derivedPower;
+                if (derivedCoef == 1) {
+                    derivedExpressionArray[i] = signs[i] + "x^" + derivedPower;
+                } else derivedExpressionArray[i] = signs[i] + derivedCoef + "x^" + derivedPower;
         }
     }
 
@@ -485,7 +491,6 @@ function processExpressionForCompare(expression) {
     }
 
     return xExpression;
-        
 }
 
 const _derivativeOf = derivativeOf;
