@@ -456,10 +456,16 @@ function processExpressionForCompare(expression) {
         
 }
 
-module.exports.derivativeOf = derivativeOf;
-module.exports.calculate = calculate;
-module.exports.integralOf = integralOf;
-module.exports.compareDerivatives = compareDerivatives;
-module.exports.compareCalculations = compareCalculations;
-module.exports.compareIntegrals = compareIntegrals;
+const _derivativeOf = derivativeOf;
+export { _derivativeOf as derivativeOf };
+const _calculate = calculate;
+export { _calculate as calculate };
+const _integralOf = integralOf;
+export { _integralOf as integralOf };
+const _compareDerivatives = compareDerivatives;
+export { _compareDerivatives as compareDerivatives };
+const _compareCalculations = compareCalculations;
+export { _compareCalculations as compareCalculations };
+const _compareIntegrals = compareIntegrals;
+export { _compareIntegrals as compareIntegrals };
 
