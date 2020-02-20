@@ -64,3 +64,15 @@ export const functionDatabase = [
   '-x^4-x^5-11',        '-2x^4+x^2-22',       '-2x^3+x^2-21',
   '-x+x^2-x^3-25'
 ];
+
+import {
+  compareDerivative,
+  derivativeOf,
+  compareCalculation,
+  calculate,
+  integralOf,
+  compareIntegrals
+} from './calculusFunctions';
+
+
+console.log(derivativeOf('4x^2'));
