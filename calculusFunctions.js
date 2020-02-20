@@ -456,6 +456,7 @@ function processExpressionForCompare(expression) {
         
 }
 
+<<<<<<< HEAD
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
 const _calculate = calculate;
@@ -469,3 +470,11 @@ export { _compareCalculations as compareCalculations };
 const _compareIntegrals = compareIntegrals;
 export { _compareIntegrals as compareIntegrals };
 
+=======
+module.exports.derivativeOf = derivativeOf;
+module.exports.calculate = calculate;
+module.exports.integralOf = integralOf;
+module.exports.compareDerivatives = compareDerivatives;
+module.exports.compareCalculations = compareCalculations;
+module.exports.compareIntegrals = compareIntegrals;
+>>>>>>> 045949acd7a9b361504290ea2bb97c93eb9524ee
