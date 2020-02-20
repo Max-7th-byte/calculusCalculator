@@ -452,7 +452,13 @@ function processExpressionForCompare(expression) {
         xExpression[i] = sign + coef + power;
     }
 
-   
     return xExpression;
         
 }
+
+module.exports.derivativeOf = derivativeOf;
+module.exports.calculate = calculate;
+module.exports.integralOf = integralOf;
+module.exports.compareDerivatives = compareDerivatives;
+module.exports.compareCalculations = compareCalculations;
+module.exports.compareIntegrals = compareIntegrals;
