@@ -87,7 +87,7 @@ function calculate(expression, value) {
     for (let i = 0; i < numbers.length; i++) {
         if (signOfNumber[i].toString() == '+' || signOfNumber[i].toString() == '') {
             answer += Number(numbers[i]);
-        } else if (signOfNumber[i].toStirng() == '-') {
+        } else if (signOfNumber[i].toString() == '-') {
             answer -= Number(numbers[i]);
         } else throw new Error('Misread sign of the number' + numbers[i]);
     }
