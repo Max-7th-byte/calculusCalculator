@@ -87,7 +87,7 @@ function calculate(expression, value) {
     for (let i = 0; i < numbers.length; i++) {
         if (signOfNumber[i].toString() == '+' || signOfNumber[i].toString() == '') {
             answer += Number(numbers[i]);
-        } else if (signOfNumber[i].toStirng() == '-') {
+        } else if (signOfNumber[i].toString() == '-') {
             answer -= Number(numbers[i]);
         } else throw new Error('Misread sign of the number' + numbers[i]);
     }
@@ -403,8 +403,8 @@ function compare(userAnswer, correctAnswer) {
     correctAnswer = simplify(correctAnswer);
 
     // processing number written by user
-    const numberOfUser = getNumbers(userAnswer)[0];
-    const correctNumber = getNumbers(correctAnswer)[0];
+    const numberOfUser = getNumbers(userAnswer).sObj.signs[0] + getNumbers(userAnswer).nObj.numbers[0];
+    const correctNumber = getNumbers(correctAnswer).sObj.signs[0] + getNumbers(correctAnswer).nObj.numbers[0];
 
     if (numberOfUser != correctNumber) {
         return false;
@@ -462,3 +462,4 @@ module.exports.integralOf = integralOf;
 module.exports.compareDerivatives = compareDerivatives;
 module.exports.compareCalculations = compareCalculations;
 module.exports.compareIntegrals = compareIntegrals;
+
