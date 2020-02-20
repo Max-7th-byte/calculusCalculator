@@ -210,12 +210,12 @@ function getPolynomialWithX(expression) {
 
 function getNumbers(expression) {
 
+    expression = processQuotients(expression);
 
   let numbersInExpression = expression.replace(
     extractXReg, 
     ''
     );
-
 
     let sObj = {signs: [], s: 0};
     let nObj = {numbers: [], n: 0};
@@ -487,8 +487,6 @@ function processExpressionForCompare(expression) {
     return xExpression;
         
 }
-
-console.log(compareDerivatives('x^3', '1/4x^4 + 12'));
 
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
