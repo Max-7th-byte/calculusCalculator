@@ -374,14 +374,14 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
     return simplified;
 }
 
-  function compareDerivative(userAnswer, func) {
+  function compareDerivatives(userAnswer, func) {
     const correctDerivative = derivativeOf(func);
     if (compare(userAnswer, correctDerivative)) {
         return true;
     } else return false;
   }
   
-  function compareCalculation(userAnswer, func, value) {
+  function compareCalculations(userAnswer, func, value) {
     const correctCalculation = calculate(func, value);
     if (userAnswer == correctCalculation) {
       return true;
@@ -389,10 +389,10 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
   }
   
   function compareIntegrals(userAnswer, func) {
-    // const correctIntegral = integralOf(func);
-    // if (userAnswer == correctIntegral) {
-    //   return true;
-    // } else return false;
+    const correctIntegral = integralOf(func);
+    if (compare(userAnswer, correctIntegral)) {
+      return true;
+    } else return false;
   }
 
 // COMPARE HELPERS
@@ -456,5 +456,3 @@ function processExpressionForCompare(expression) {
     return xExpression;
         
 }
-
-console.log(compare('4x^2 + 4x + 5x^3', '4x + 4x^2 + 5x^3'));
