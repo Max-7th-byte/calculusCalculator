@@ -403,32 +403,39 @@ function compare(userAnswer, correctAnswer) {
     correctAnswer = simplify(correctAnswer);
 
     // processing number written by user
-    let numberOfUser = getNumbers(userAnswer)[0];
-    let correctNumber = getNumbers(correctAnswer)[0];
+    const numberOfUser = getNumbers(userAnswer)[0];
+    const correctNumber = getNumbers(correctAnswer)[0];
 
-    if (correctNumber == null) correctNumber = 0;
-    if (numberOfUser == null) numberOfUser = 0;
     if (numberOfUser != correctNumber) {
         return false;
     }
     //
 
-    let usersExpressionX = processExpressionForCompare(userAnswer);
-    let correctExpressionX = processExpressionForCompare(correctAnswer);
+    const usersExpressionX = processExpressionForCompare(userAnswer);
+    const correctExpressionX = processExpressionForCompare(correctAnswer);
+    if (usersExpressionX.length != correctExpressionX.length) return false;
 
-    console.log(usersExpressionX);
-    console.log(correctExpressionX);
+    let expressionsAreEqual = false;
 
+    let numberOfElementsRemaining = usersExpressionX.length;
     for (let i = 0; i < usersExpressionX.length; i++) {
-        for (let j = i+1; j < correctExpressionX.length; j++) {
-
+        for (let j = 0; j < correctExpressionX.length; j++) {
+            if (usersExpressionX[i] == correctExpressionX[j]) {
+                numberOfElementsRemaining--;
+            }
         }
     }
+
+    if (numberOfElementsRemaining == 0) {
+        expressionsAreEqual = true;
+    }
+
+    return expressionsAreEqual;
 }
 
 function processExpressionForCompare(expression) {
 
-    let xExtractor = getPolynomialWithX(simplify(expression));
+    const xExtractor = getPolynomialWithX(simplify(expression));
 
     let xExpression = [];
 
@@ -450,4 +457,4 @@ function processExpressionForCompare(expression) {
         
 }
 
-console.log(compare('4x^2 + 12 + 46x^3', '13 - 1 - 2x^2 + 6x^2 + 46x^3 - 2x^3 + 2x^3'));
+console.log(compare('4x^2 + 4x + 5x^3', '4x + 4x^2 + 5x^3'));
