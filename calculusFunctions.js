@@ -288,9 +288,9 @@ function simplify(expression) {
             if (haveTheSamePowers) {
                 powersCollector[0] = i;
                 equalPowersPositions[EPP++] = powersCollector;
+                equalPowers[EP++] = powersOfX[i];
             }
         }
-        equalPowers[EP++] = powersOfX[i];
     }
 
     return {
@@ -368,19 +368,17 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
         }
         if (powersOfX[positionNumber] == 1) {
             simplified += signsOfX[positionNumber] + coefsOfX[positionNumber] + 'x';
-        } else simplified += signsOfX[positionNumber] + coefsOfX[positionNumber] + 'x^' + powers[positionNumber];
+        } else simplified += signsOfX[positionNumber] + coefsOfX[positionNumber] + 'x^' + powersOfX[positionNumber];
     }
 
     return simplified;
 }
 
   function compareDerivative(userAnswer, func) {
-
-    const correctDer = derivativeOf(func);
-
-    // if (userAnswer == correctDer) {
-    //   return true;
-    // } else return false;
+    const correctDerivative = derivativeOf(func);
+    if (compare(userAnswer, correctDerivative)) {
+        return true;
+    } else return false;
   }
   
   function compareCalculation(userAnswer, func, value) {
@@ -397,37 +395,42 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
     // } else return false;
   }
 
-// COMPARE HELPER
+// COMPARE HELPERS
 
 function compare(userAnswer, correctAnswer) {
 
-    // processting user's answer
-    let xExtractor = getPolynomialWithX(simplify(userAnswer));
+    userAnswer = simplify(userAnswer);
+    correctAnswer = simplify(correctAnswer);
 
-    let xExpressionUser = [];
+    // processing number written by user
+    let numberOfUser = getNumbers(userAnswer)[0];
+    let correctNumber = getNumbers(correctAnswer)[0];
 
-    for (let i = 0; i < xExtractor.cObj.coef.length; i++) {
-        let coef = xExtractor.cObj.coef[i];
-        if (coef == 1) coef = '';
-
-        let power = xExtractor.pObj.powers[i];
-        if (power == 1) power = 'x';
-        else power = 'x^' + power;
-        xExpressionUser[i] = xExtractor.sObj.signs[i] + coef + power;
-    }
-
-    let numberExtractor = getNumbers(userAnswer);
-
-    let numberExpressionUser = [];
-
-    for (let i = 0; i < numberExtractor.nObj.numbers.length; i++) {
-        numberExpressionUser[i] = numberExtractor.sObj.signs[i] + numberExtractor.nObj.numbers[i];
+    if (correctNumber == null) correctNumber = 0;
+    if (numberOfUser == null) numberOfUser = 0;
+    if (numberOfUser != correctNumber) {
+        return false;
     }
     //
 
-    xExtractor = getPolynomialWithX(simplify(correctAnswer));
+    let usersExpressionX = processExpressionForCompare(userAnswer);
+    let correctExpressionX = processExpressionForCompare(correctAnswer);
 
-    let xExpressionCorrectAns = [];
+    console.log(usersExpressionX);
+    console.log(correctExpressionX);
+
+    for (let i = 0; i < usersExpressionX.length; i++) {
+        for (let j = i+1; j < correctExpressionX.length; j++) {
+
+        }
+    }
+}
+
+function processExpressionForCompare(expression) {
+
+    let xExtractor = getPolynomialWithX(simplify(expression));
+
+    let xExpression = [];
 
     for (let i = 0; i < xExtractor.cObj.coef.length; i++) {
         let coef = xExtractor.cObj.coef[i];
@@ -436,11 +439,15 @@ function compare(userAnswer, correctAnswer) {
         let power = xExtractor.pObj.powers[i];
         if (power == 1) power = 'x';
         else power = 'x^' + power;
-        xExpressionCorrectAns[i] = xExtractor.sObj.signs[i] + coef + power;
-        console.log(xExtractor.sObj.signs[i]);
+
+        let sign = xExtractor.sObj.signs[i];
+        if (sign == '') sign = '+';
+        xExpression[i] = sign + coef + power;
     }
 
-    return xExpressionCorrectAns;
+   
+    return xExpression;
+        
 }
 
-console.log(compare('54 + 4x^2 - 5x^2 + 12x', '2x - 2x + 4x^2'));
+console.log(compare('4x^2 + 12 + 46x^3', '13 - 1 - 2x^2 + 6x^2 + 46x^3 - 2x^3 + 2x^3'));
