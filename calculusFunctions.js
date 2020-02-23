@@ -122,8 +122,8 @@ function integralOf(expression) {
     let integratedUnit;
     for (let i = 0; i < powersOfX.length; i++) {
       integratedPower = Number(powersOfX[i]) + 1;
-      let integratedCoef = Number((coefsOfX[i]/integratedPower).toFixed(2));
-      if (integratedCoef == 1) {
+      let integratedCoef = coefsOfX[i] + '/' + integratedPower; // Number((coefsOfX[i]/integratedPower).toFixed(2));
+      if (coefsOfX[i]/integratedPower == 1) {
         integratedCoef = '';
       }
       integratedUnit = signsOfX[i] + integratedCoef + 'x^' +  integratedPower;
@@ -164,7 +164,7 @@ function processQuotients(expression) {
 
     let decimals = [];
     for (let i = 0; i < numerators.length; i++) {
-        decimals[i] = Number(numerators[i] / denominators[i]).toFixed(2);
+        decimals[i] = Number(numerators[i] / denominators[i]);
         expression = expression.replace(numerators[i] + '\/' + denominators[i], decimals[i]);
     }
 
@@ -395,12 +395,9 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
     let positionNumber = '';
     for (let i = 0; i < singleCoefsPosition.length; i++) {
         positionNumber = singleCoefsPosition[i];
-        if(coefsOfX[positionNumber] == 1) {
-            coefsOfX[positionNumber] = '';
-        }
         if (powersOfX[positionNumber] == 1) {
-            simplified += signsOfX[positionNumber] + coefsOfX[positionNumber] + 'x';
-        } else simplified += signsOfX[positionNumber] + coefsOfX[positionNumber] + 'x^' + powersOfX[positionNumber];
+            simplified += signsOfX[positionNumber] + Number(coefsOfX[positionNumber]).toFixed(2) + 'x';
+        } else simplified += signsOfX[positionNumber] + Number(coefsOfX[positionNumber]).toFixed(2) + 'x^' + powersOfX[positionNumber];
     }
 
     return simplified;
@@ -433,8 +430,6 @@ function compare(userAnswer, correctAnswer) {
 
     userAnswer = simplify(userAnswer);
     correctAnswer = simplify(correctAnswer);
-
-    console.log(userAnswer + "|" + correctAnswer);
 
     // processing number written by user
     let numberOfUser = getNumbers(userAnswer).sObj.signs[0] + getNumbers(userAnswer).nObj.numbers[0];
@@ -492,6 +487,8 @@ function processExpressionForCompare(expression) {
 
     return xExpression;
 }
+
+
 
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };

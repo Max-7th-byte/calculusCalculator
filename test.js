@@ -29,3 +29,13 @@ function xOverNumber(expression) {
 }
 
 console.log(xOverNumber('(2x/3)^4+5x/6+(4x/5)^2'));
+
+
+for (let k = 0; k < 5; k++) {
+    let approximation = usersExpressionX[i].toString().replace(/\d+\.\d+/g, coefArray[k]);
+    console.log(approximation + "|" + correctAnswer[j]);
+    if (approximation == correctAnswer[j]) {
+        numberOfElementsRemaining--;
+        break;
+    }              
+}
