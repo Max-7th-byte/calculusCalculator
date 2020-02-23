@@ -10,9 +10,11 @@ function xOverNumber(expression) {
         numertor = match[1];
         denominator = match[2];
         power = match[3];
-        console.log(numertor + "|" + denominator + "|" + power);
         if (numertor == null) numertor = 1;
-        expression = expression.replace(regXOverNumberWithPower, Math.pow(numertor, power) + '/' + Math.pow(denominator, power) + 'x^' + power);
+            expression = expression.replace(
+                '(' + numertor + 'x/' + denominator + ')^' + power,
+                Math.pow(numertor, power) + '/' + Math.pow(denominator, power) + 'x^' + power
+            );
     }
 
     const regXOverNumberWithoutPower = /(\d*)x\/(\d+)/g;
@@ -28,14 +30,4 @@ function xOverNumber(expression) {
     return expression;
 }
 
-console.log(xOverNumber('(2x/3)^4+5x/6+(4x/5)^2'));
-
-
-for (let k = 0; k < 5; k++) {
-    let approximation = usersExpressionX[i].toString().replace(/\d+\.\d+/g, coefArray[k]);
-    console.log(approximation + "|" + correctAnswer[j]);
-    if (approximation == correctAnswer[j]) {
-        numberOfElementsRemaining--;
-        break;
-    }              
-}
+console.log(xOverNumber('12-(2x/3)^2-5x/6-(4x/5)^3 + 15 - 3/6x^22'));
