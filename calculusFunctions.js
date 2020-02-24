@@ -1,6 +1,6 @@
 // TO REFACTOR
-const extractXReg = /\s*([\+|-]*)\s*(\d+\.\d+|\d+)*x\^*(\d+)*\s*/g;
-const extractNumberReg = /\s*([\+|-]*)\s*(\d+\.\d+|\d+)\s*/g;
+const extractXReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)*x\^*(\d+)*\s*/g;
+const extractNumberReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)\s*/g;
 //
 
 const functionDatabase = [
@@ -82,10 +82,51 @@ const functionDatabase = [
  */
 
 
+//
+//LOW-LEVEL EXTRACTORS HELPERS
+//
+function processXOverNumber(expression) {
+
+    const regXOverNumberWithPower = /\((\d+)*x\/(\d+)\)\^(\d+)/g;
+
+    let match;
+    let numerator = 0;
+    let denominator = 0;
+    let power = 0;
+    while ((match = regXOverNumberWithPower.exec(expression)) != null) {
+        numerator = match[1];
+        denominator = match[2];
+        power = match[3];
+        let unitToReplace = '';
+        if (numerator == null) {
+            numerator = 1;
+            unitToReplace = '(' + 'x/' + denominator + ')^' + power
+        } else unitToReplace = '(' + numerator + 'x/' + denominator + ')^' + power;
+            
+        expression = expression.replace(
+            unitToReplace,
+            Math.pow(numerator, power) + '/' + Math.pow(denominator, power) + 'x^' + power
+        );
+    }
+
+    const regXOverNumberWithoutPower = /(\d*)x\/(\d+)/g;
+
+    while ((match = regXOverNumberWithoutPower.exec(expression)) != null) {
+        numerator = match[1];
+        if (numerator == '') numerator = 1;
+        denominator = match[2];
+        expression = expression.replace(regXOverNumberWithoutPower, numerator + '/' + denominator + 'x');
+    }
+
+    return expression;
+}
+
  //
  // LOW-LEVEL EXTRACTORS
  //
-function getPolynomialWithX(expression) {
+function getPolynomialsWithX(expression) {
+
+    expression = processXOverNumber(expression);
 
     let cObj = {
         coef: [],
@@ -127,10 +168,9 @@ function getPolynomialWithX(expression) {
 
 function getNumbers(expression) {
 
-    expression = xOverNumber(expression);
-    expression = processQuotients(expression);
+    expression = processXOverNumber(expression);
 
-  let numbersInExpression = expression.replace(
+    let numbersInExpression = expression.replace(
     extractXReg, 
     ''
     );
@@ -155,3 +195,14 @@ function getNumbers(expression) {
 // 
 //
 //
+
+
+function check(func) {
+    for (let i = 0; i < functionDatabase.length; i++) {
+        process.stdout.write('Function ' + functionDatabase[i] + ' --> ');
+        console.log(func(functionDatabase[i]));
+    }
+}
+
+//check(getNumbers);
+console.log(getNumbers('-0.25x^2 - (x/4)^2 + 14x + 15.234'));
