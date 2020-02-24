@@ -193,9 +193,37 @@ function getNumbers(expression) {
 }
 
 // 
-//
+// HIGH-LEVEL EXTRACTORS
 //
 
+function expressionInDecimals(expression) {
+
+    const reg = /(\d+)\/(\d+)/g;
+
+    let numerators = [];
+    let N = 0;
+    let denominators = [];
+    let D = 0;
+    let match;
+    while ((match = reg.exec(expression)) != null) {
+        numerators[N++] = match[1];
+        denominators[D++] = match[2];
+    }
+
+    let decimals = [];
+    for (let i = 0; i < numerators.length; i++) {
+        decimals[i] = Number(numerators[i]/denominators[i]);
+        expression = expression.replace(numerators[i] + '\/' + denominators[i], decimals[i]);
+    }
+
+    return expression;
+}
+
+console.log(expressionInDecimals('-0.25x^3-1/2x^2+14x+15.234'))
+
+function expressionInFractions(expression) {
+
+}
 
 function check(func) {
     for (let i = 0; i < functionDatabase.length; i++) {
@@ -204,5 +232,3 @@ function check(func) {
     }
 }
 
-//check(getNumbers);
-console.log(getNumbers('-0.25x^2 - (x/4)^2 + 14x + 15.234'));
