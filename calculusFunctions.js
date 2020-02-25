@@ -276,16 +276,14 @@ function simplify(expression) {
     signsOfXDecimal = turnNullToPlus(signsOfXDecimal);
     signsOfNumbersDecimal = turnNullToPlus(signsOfNumbersDecimal);
 
-    let simplifiedDecimal = sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) + sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal);
+    let simplifiedDecimal = simplifyDecimals(sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal)) + sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal);
     let simplifiedFractional = simplifyFractions(getExpressionInFractions(simplifiedDecimal));
 
     return {
-        "simplifiedDecimal": simplifiedDecimal,
-        "simplifiedFractional": simplifiedFractional
+        "simplifiedDecimal": simplifiedDecimal.toString().replace(/^\+/, ''),
+        "simplifiedFractional": simplifiedFractional.toString().replace(/^\+/, '')
     };
 }
-
-console.log(simplify('4.2x^2 + 0.9x^2 + 6x^3 - 0.9x^3').simplifiedFractional);
 
 function turnNullToPlus(signs) {
     for (let i = 0; i < signs.length; i++) {
@@ -352,13 +350,17 @@ function sumUpSamePowersDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDeci
         if (sumedUpCoef != 0) {
 
             let coefWithSign = '';
-            if (sumedUpCoef > 0 && sumedUpCoef == 1) {
-                coefWithSign = '+';
-            } else coefWithSign = '+' + sumedUpCoef;
+            if (sumedUpCoef > 0) {
+                if (sumedUpCoef == 1) {
+                    coefWithSign = '+';
+                } else coefWithSign = '+' + sumedUpCoef;
+            }
 
-            if (sumedUpCoef < 0 && sumedUpCoef == -1) {
-                coefWithSign = '-';
-            } else coefWithSign = sumedUpCoef;
+            if (sumedUpCoef < 0) {
+                if (sumedUpCoef == -1) {
+                    coefWithSign = '-';
+                } else coefWithSign = sumedUpCoef;
+            } 
 
             if (powers[i] == 1) {
                 simplified += coefWithSign + 'x';
@@ -410,7 +412,9 @@ function sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) {
         positionNumber = singleCoefsPosition[i];
         if (powersOfXDecimal[positionNumber] == 1) {
             simplified += signsOfXDecimal[positionNumber] + Number(coefsOfXDecimal[positionNumber]) + 'x';
-        } else simplified += signsOfXDecimal[positionNumber] + Number(coefsOfXDecimal[positionNumber]) + 'x^' + powersOfXDecimal[positionNumber];
+        } else {
+            simplified += signsOfXDecimal[positionNumber] + Number(coefsOfXDecimal[positionNumber]) + 'x^' + powersOfXDecimal[positionNumber];
+        }
     }
 
     return simplified;
@@ -432,6 +436,16 @@ function sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal) {
     }
     
     return toReturn;
+}
+
+function GCD(a, b) {
+    let remainder;
+    while (a > 0) {
+        remainder = b%a;
+        b = a;
+        a = remainder;
+    }
+    return b;
 }
 
 function simplifyFractions(expression) {
@@ -462,18 +476,56 @@ function simplifyFractions(expression) {
                 fixedNumerator = numerators[i].toString().substr(0, begining);
                 fixedDenominator = denominators[i].toString().substr(0, begining);
                 expression = expression.replace(numerators[i] + '/' + denominators[i], fixedNumerator + '/' + fixedDenominator);
+                numerators[i] = fixedNumerator;
+                denominators[i] = fixedDenominator;
                 switched = false;
             }
             if (numerators[i].charAt(j) == '0') {
                 if (firstZero) {begining = j; firstZero = false} else amountOfZeros++;
             }
         }
+
+        let gcd = GCD(numerators[i], denominators[i]);
+        fixedNumerator = Number(numerators[i]) / gcd;
+        fixedDenominator = Number(denominators[i]) / gcd;
+        expression = expression.replace(numerators[i] + '/' + denominators[i], fixedNumerator + '/' + fixedDenominator);
     }
 
     return expression;
 }
 
+function simplifyDecimals(expression) {
 
+    const reg = /\d+\.(\d+)/g;
+
+    let decimalPlaces = [];
+    let DP = 0;
+
+    let match;
+    while ((match = reg.exec(expression)) != null) {
+        decimalPlaces[DP++] = match[1];
+    }
+
+    let amountOfZeros = 0;
+    let firstZero = true;
+    let begining = 0;
+    let switched = true;
+    for (let i = 0; i < decimalPlaces.length; i++) {
+        for (let j = 0; j < decimalPlaces[i].length && switched; j++) {
+            
+            if (amountOfZeros >= 7) {
+                expression = expression.replace(decimalPlaces[i], decimalPlaces[i].toString().substr(0, begining));
+                switched = false;
+            }
+
+            if (decimalPlaces[i].toString().charAt(j) == '0') {
+                if (firstZero) {begining = j; firstZero = false;} else amountOfZeros++;
+            } 
+        }
+    }
+
+    return expression
+}
 
 
 
