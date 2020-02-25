@@ -69,15 +69,13 @@ const functionDatabase = [
     '-x+x^2-x^3-25'
 ];
 
-/**
- * Store two instansese of the expression -- decimal and fractional one !!! (maybe two different simplify functions will be used) !!!
+/** 
  * Then in a loop compare user's simplified unit of the answer with two units of 
  * the correct answer. If there is a match -- count it as correct.
  * 
  * Two different instanses will be returned in functions derive & integralOf
  * 
  * Functions getPolynomialWithX and getNumbers need a refactor in order to detect any type of a const/number
- * extractXReg and extractNumberReg will be rewritten as improved once, which will be capable of finding any type of number
  */
 
 
@@ -145,7 +143,7 @@ function derive(expression) {
 function calculate(expression, value) {
 
     let xExtractor = getPolynomialWithX(expression);
-    let signsOfX = xExtractor.sObj.signs; // passes no sign as ''
+    let signsOfX = xExtractor.sObj.signs; 
     let coefsOfX = xExtractor.cObj.coef;
     let powersOfX = xExtractor.pObj.powers;
 
@@ -163,7 +161,7 @@ function calculate(expression, value) {
 
     let numberExtractor = getNumbers(expression);
     let numbers = numberExtractor.nObj.numbers;
-    let signOfNumber = numberExtractor.sObj.signs; // passes no sign as ''
+    let signOfNumber = numberExtractor.sObj.signs; 
 
     for (let i = 0; i < numbers.length; i++) {
         if (signOfNumber[i].toString() == '+' || signOfNumber[i].toString() == '') {
@@ -190,14 +188,14 @@ function integralOf(expression) {
     let xExtractor = getPolynomialWithX(expression);
     let coefsOfX = xExtractor.cObj.coef;
     let powersOfX = xExtractor.pObj.powers;
-    let signsOfX = xExtractor.sObj.signs; // passes no sign as ''
+    let signsOfX = xExtractor.sObj.signs; 
 
     let integratedExpression = '';
     let integratedPower;
     let integratedUnit;
     for (let i = 0; i < powersOfX.length; i++) {
         integratedPower = Number(powersOfX[i]) + 1;
-        let integratedCoef = coefsOfX[i] + '/' + integratedPower; // Number((coefsOfX[i]/integratedPower).toFixed(2));
+        let integratedCoef = coefsOfX[i] + '/' + integratedPower;
         if (coefsOfX[i] / integratedPower == 1) {
             integratedCoef = '';
         }
@@ -560,7 +558,7 @@ function sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) {
             simplified += signsOfXDecimal[positionNumber] + Number(coefsOfXDecimal[positionNumber]) + 'x^' + powersOfXDecimal[positionNumber];
         }
     }
-
+    
     return simplified;
 }
 
@@ -653,23 +651,34 @@ function simplifyDecimals(expression) {
         decimalPlaces[DP++] = match[1];
     }
 
-    let amountOfZeros = 0;
-    let firstZero = true;
+    let amountOfRepetitiveNumbers = 0;
+    let firstRepetitiveNumber = true;
     let begining = 0;
     let switched = true;
     for (let i = 0; i < decimalPlaces.length; i++) {
-        for (let j = 0; j < decimalPlaces[i].length && switched; j++) {
+        let repetitiveNumber = decimalPlaces[i].toString().charAt(0);
+        for (let j = 1; j < decimalPlaces[i].length && switched; j++) {
 
-            if (amountOfZeros >= 7) {
-                expression = expression.replace(decimalPlaces[i], decimalPlaces[i].toString().substr(0, begining));
+            if (amountOfRepetitiveNumbers >= 7) {
+                if (repetitiveNumber >= 5) {
+                    expression = expression.replace(decimalPlaces[i], decimalPlaces[i].toString().substr(0, begining));
+                    decimalPlaces[i] = decimalPlaces[i].toString().substr(0, begining);
+                    
+                    let finalNumber = Number(decimalPlaces[i].substr(decimalPlaces[i].length - 2, decimalPlaces[i].length)) + 1;
+                    finalNumber = finalNumber.toString().replace(/0$/, '');
+                    expression = expression.replace(decimalPlaces[i].substr(decimalPlaces[i].length - 2, ), finalNumber);
+                } else expression = expression.replace(decimalPlaces[i], decimalPlaces[i].toString().substr(0, begining - 1));
                 switched = false;
             }
 
-            if (decimalPlaces[i].toString().charAt(j) == '0') {
-                if (firstZero) {
+            if (decimalPlaces[i].toString().charAt(j) == repetitiveNumber) {
+                if (firstRepetitiveNumber) {
                     begining = j;
-                    firstZero = false;
-                } else amountOfZeros++;
+                    firstRepetitiveNumber = false;
+                } else amountOfRepetitiveNumbers++;
+            } else {
+                repetitiveNumber = decimalPlaces[i].toString().charAt(j);
+                firstRepetitiveNumber = true;
             }
         }
     }
@@ -706,33 +715,33 @@ function compareIntegrals(userAnswer, func) {
 
 function compare(userAnswer, correctAnswer) {
 
-    userAnswer = simplify(userAnswer);
-    correctAnswer = simplify(correctAnswer);
+    let userSimplified = simplify(userAnswer);
+    let userAnswerDecimal = userSimplified.simplifiedDecimal;
+    let userAnswerFractional = userSimplified.simplifiedFractional;
 
-    // processing number written by user
-    let numberOfUser = getNumbers(userAnswer).sObj.signs[0] + getNumbers(userAnswer).nObj.numbers[0];
-    let correctNumber = getNumbers(correctAnswer).sObj.signs[0] + getNumbers(correctAnswer).nObj.numbers[0];
+    let correctAnswerSimplified = simplify(correctAnswer);
+    let correctAnswerDecimal = correctAnswerSimplified.simplifiedDecimal;
+    let correctAnswerFractional = correctAnswerSimplified.simplifiedFractional;
 
+    if (!compareNumbers) return false;
 
+    const usersExpressionXDecimal = processExpressionForCompare(userAnswerDecimal);
+    const usersExpressionXFractional = processExpressionForCompare(userAnswerFractional);
 
-    if (isNaN(numberOfUser)) numberOfUser = 0;
-    if (isNaN(correctNumber)) correctNumber = 0;
-    if (numberOfUser != correctNumber) {
-        return false;
-    }
-    //
+    const correctExpressionXDecimal = processExpressionForCompare(correctAnswerDecimal);
+    const correctExpressionXFractional = processExpressionForCompare(correctAnswerFractional);
 
-    const usersExpressionX = processExpressionForCompare(userAnswer);
-    const correctExpressionX = processExpressionForCompare(correctAnswer);
-    if (usersExpressionX.length != correctExpressionX.length) return false;
+    if (usersExpressionXDecimal.length != correctExpressionXDecimal.length) return false;
 
     let expressionsAreEqual = false;
-
-    let numberOfElementsRemaining = usersExpressionX.length;
-    for (let i = 0; i < usersExpressionX.length; i++) {
-        for (let j = 0; j < correctExpressionX.length; j++) {
-            if (usersExpressionX[i] == correctExpressionX[j]) {
-                numberOfElementsRemaining--;
+    let numberOfElementsRemaining = usersExpressionXDecimal.length;
+    for (let i = 0; i < usersExpressionXDecimal.length; i++) {
+        for (let j = 0; j < correctExpressionXDecimal.length; j++) {
+            if (
+                usersExpressionXDecimal[i] == correctExpressionXDecimal[j] || 
+                usersExpressionXFractional[i] == correctExpressionXFractional[j]
+                ) {
+                    numberOfElementsRemaining--;
             }
         }
     }
@@ -743,10 +752,37 @@ function compare(userAnswer, correctAnswer) {
 
     return expressionsAreEqual;
 }
+      
+function compareNumbers(
+    userAnswerDecimal,
+    userAnswerFractional,
+    correctAnswerDecimal,
+    correctAnswerFractional
+    ) {
+
+        let numberOfUserDecimal = getNumbers(userAnswerDecimal).sObj.signs[0] + getNumbers(userAnswerDecimal).nObj.numbers[0];
+    let numberOfUserFractional = getNumbers(userAnswerFractional).sObj.signs[0] + getNumbers(userAnswerFractional).nObj.numbers[0];
+
+    let correctNumberDecimal = getNumbers(correctAnswerDecimal).sObj.signs[0] + getNumbers(correctAnswerDecimal).nObj.numbers[0];
+    let correctNumberFractional = getNumbers(correctAnswerFractional).sObj.signs[0] + getNumbers(correctAnswerFractional).nObj.numbers[0];
+
+    if (isNaN(numberOfUserDecimal)) {
+        numberOfUserDecimal = 0;
+        numberOfUserFractional = 0;
+    }
+
+    if (isNaN(correctNumberDecimal)) {
+        correctNumberDecimal = 0;
+        correctNumberFractional = 0;
+    }
+
+    if (Number(numberOfUserDecimal) != Number(correctNumberDecimal) || Number(numberOfUserFractional) != Number(correctNumberFractional))
+        return false; else return true;
+}
 
 function processExpressionForCompare(expression) {
 
-    const xExtractor = getPolynomialWithX(simplify(expression));
+    const xExtractor = getPolynomialWithX(expression);
 
     let xExpression = [];
 
@@ -766,15 +802,6 @@ function processExpressionForCompare(expression) {
     return xExpression;
 }
 
-function ch(func) {
-    console.log(func);
-    console.log(simplify(func).simplifiedDecimal);
-    console.log(simplify(func).simplifiedFractional);
-}
-
-
-ch('3/4x^2 - 12 + 24/4 - 5/20x^4 - (3x/2)^2 + 0.36x^4');
-
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
 const _calculate = calculate;
@@ -787,10 +814,3 @@ const _compareCalculations = compareCalculations;
 export { _compareCalculations as compareCalculations };
 const _compareIntegrals = compareIntegrals;
 export { _compareIntegrals as compareIntegrals };
- 
-// function check(func) {
-//     for (let i = 0; i < functionDatabase.length; i++) {
-//         process.stdout.write(functionDatabase[i] + ' --> ');
-//         console.log(func(functionDatabase[i]));
-//     }
-// }
