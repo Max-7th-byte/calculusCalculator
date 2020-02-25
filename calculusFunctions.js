@@ -723,7 +723,7 @@ function compare(userAnswer, correctAnswer) {
     let correctAnswerDecimal = correctAnswerSimplified.simplifiedDecimal;
     let correctAnswerFractional = correctAnswerSimplified.simplifiedFractional;
 
-    if (!compareNumbers) return false;
+    if (numbersNotEqual(userAnswerDecimal, userAnswerFractional, correctAnswerDecimal, correctAnswerFractional)) return false;
 
     const usersExpressionXDecimal = processExpressionForCompare(userAnswerDecimal);
     const usersExpressionXFractional = processExpressionForCompare(userAnswerFractional);
@@ -753,14 +753,14 @@ function compare(userAnswer, correctAnswer) {
     return expressionsAreEqual;
 }
       
-function compareNumbers(
+function numbersNotEqual(
     userAnswerDecimal,
     userAnswerFractional,
     correctAnswerDecimal,
     correctAnswerFractional
     ) {
 
-        let numberOfUserDecimal = getNumbers(userAnswerDecimal).sObj.signs[0] + getNumbers(userAnswerDecimal).nObj.numbers[0];
+    let numberOfUserDecimal = getNumbers(userAnswerDecimal).sObj.signs[0] + getNumbers(userAnswerDecimal).nObj.numbers[0];
     let numberOfUserFractional = getNumbers(userAnswerFractional).sObj.signs[0] + getNumbers(userAnswerFractional).nObj.numbers[0];
 
     let correctNumberDecimal = getNumbers(correctAnswerDecimal).sObj.signs[0] + getNumbers(correctAnswerDecimal).nObj.numbers[0];
@@ -776,8 +776,11 @@ function compareNumbers(
         correctNumberFractional = 0;
     }
 
-    if (Number(numberOfUserDecimal) != Number(correctNumberDecimal) || Number(numberOfUserFractional) != Number(correctNumberFractional))
-        return false; else return true;
+    if (
+        Number(numberOfUserDecimal) != Number(correctNumberDecimal) || 
+        Number(numberOfUserFractional) != Number(correctNumberFractional)
+        )
+        {return false;} else return true;
 }
 
 function processExpressionForCompare(expression) {
@@ -801,6 +804,8 @@ function processExpressionForCompare(expression) {
 
     return xExpression;
 }
+
+console.log(compareDerivatives('16x^3 + 1554/100', '4x^4 + 15.54x'));
 
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
