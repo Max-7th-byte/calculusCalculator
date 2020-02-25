@@ -277,26 +277,15 @@ function simplify(expression) {
     signsOfNumbersDecimal = turnNullToPlus(signsOfNumbersDecimal);
 
     let simplifiedDecimal = sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) + sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal);
-    
-    let fractionalExpression = getExpressionInFractions(expression);
-    let fractionalExpressionWithX = getPolynomialWithX(expression);
-    let coefsOfXFractional = fractionalExpressionWithX.cObj.coef;
-    let powersOfXFractional = fractionalExpressionWithX.pObj.powers;
-    let signsOfXFractional = fractionalExpressionWithX.sObj.signs;
-    let fractionalExpressionWithNumbers = getNumbers(expression);
-    let numbersFractional = fractionalExpressionWithNumbers.nObj.numbers;
-    let signsOfNumbersFractional = fractionalExpressionWithNumbers.sObj.signs;
-
-    signsOfXFractional = turnNullToPlus(signsOfXFractional);
-    signsOfNumbersFractional = turnNullToPlus(signsOfNumbersFractional);
-
-    let simplifiedFractional = sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFractional);
+    let simplifiedFractional = simplifyFractions(getExpressionInFractions(simplifiedDecimal));
 
     return {
         "simplifiedDecimal": simplifiedDecimal,
         "simplifiedFractional": simplifiedFractional
     };
 }
+
+console.log(simplify('4.2x^2 + 0.9x^2 + 6x^3 - 0.9x^3').simplifiedFractional);
 
 function turnNullToPlus(signs) {
     for (let i = 0; i < signs.length; i++) {
@@ -316,11 +305,8 @@ function getSamePowers(powersOfX) {
 
         let notChecked = true;
         for (let k = 0; k < equalPowersPositions.length; k++) {
-            for (let l = 0; l < equalPowersPositions[k].length; l++) {
-                if (i == equalPowersPositions[k][l]) {
-                    notChecked = false;
-                    break;
-                }
+            for (let l = 0; l < equalPowersPositions[k].length && notChecked; l++) {
+                if (i == equalPowersPositions[k][l]) {notChecked = false;}
             }
         }
 
@@ -401,11 +387,8 @@ function getSingleCoefPositions(samePowersPositions, coefsOfXDecimal) {
     let SC = 0;
     for (let i = 0; i < coefsOfXDecimal.length; i++) {
         let notProcessed = true;
-        for (let j = 0; j < repetitiveCoefsPosition.length; j++) {
-            if (i == repetitiveCoefsPosition[j]) {
-                notProcessed = false;
-                break;
-            }
+        for (let j = 0; j < repetitiveCoefsPosition.length && notProcessed; j++) {
+            if (i == repetitiveCoefsPosition[j]) {notProcessed = false;}
         }
         if (notProcessed) {
             singleCoefsPosition[SC++] = i;
@@ -451,14 +434,44 @@ function sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal) {
     return toReturn;
 }
 
-function sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFractional) {
-    let powersProcessor = getSamePowers(powersOfXFractional);
-    let samePowersPositions = powersProcessor.equalPowersPositions; // 2D array
-    let powers = powersProcessor.equalPowers;
+function simplifyFractions(expression) {
+    
+    const reg = /(\d+)\/(\d+)/g;
 
-    let sumedUpCoef = 0;
+    let numerators = [];
+    let N = 0;
+    let denominators = [];
+    let D = 0;
+
+    let match;
+    while ((match = reg.exec(expression)) != null) {
+        numerators[N++] = match[1];
+        denominators[D++] = match[2];
+    }
+
+    let amountOfZeros = 0;
+    let firstZero = true;
+    let begining = 0;
+    let switched = true;
+    let fixedNumerator;
+    let fixedDenominator;
+    for (let i = 0; i < numerators.length; i++) {
+        for (let j = 0; j < numerators[i].toString().length && switched; j++) {
+           
+            if (amountOfZeros >= 7) {
+                fixedNumerator = numerators[i].toString().substr(0, begining);
+                fixedDenominator = denominators[i].toString().substr(0, begining);
+                expression = expression.replace(numerators[i] + '/' + denominators[i], fixedNumerator + '/' + fixedDenominator);
+                switched = false;
+            }
+            if (numerators[i].charAt(j) == '0') {
+                if (firstZero) {begining = j; firstZero = false} else amountOfZeros++;
+            }
+        }
+    }
+
+    return expression;
 }
-
 
 
 
