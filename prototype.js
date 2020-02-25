@@ -225,131 +225,131 @@ function integralOf(expression) {
 
 // HELPERS
 
-function processQuotients(expression) {
+// function processQuotients(expression) {
 
-    const regForQuotients = /(\d+)\/(\d+)/g;
+//     const regForQuotients = /(\d+)\/(\d+)/g;
 
-    let numerators = [];
-    let N = 0;
-    let denominators = [];
-    let D = 0;
-    let match;
-    while ((match = regForQuotients.exec(expression)) != null) {
-        numerators[N++] = match[1];
-        denominators[D++] = match[2];
-    }
+//     let numerators = [];
+//     let N = 0;
+//     let denominators = [];
+//     let D = 0;
+//     let match;
+//     while ((match = regForQuotients.exec(expression)) != null) {
+//         numerators[N++] = match[1];
+//         denominators[D++] = match[2];
+//     }
 
-    let decimals = [];
-    for (let i = 0; i < numerators.length; i++) {
-        decimals[i] = Number(numerators[i] / denominators[i]);
-        expression = expression.replace(numerators[i] + '\/' + denominators[i], decimals[i]);
-    }
+//     let decimals = [];
+//     for (let i = 0; i < numerators.length; i++) {
+//         decimals[i] = Number(numerators[i] / denominators[i]);
+//         expression = expression.replace(numerators[i] + '\/' + denominators[i], decimals[i]);
+//     }
 
-    return expression;
-}
+//     return expression;
+// }
 
-function xOverNumber(expression) {
+// function xOverNumber(expression) {
 
-    const regXOverNumberWithPower = /\((\d+)*x\/(\d+)\)\^(\d+)/g;
+//     const regXOverNumberWithPower = /\((\d+)*x\/(\d+)\)\^(\d+)/g;
 
-    let match;
-    let numertor = 0;
-    let denominator = 0;
-    let power = 0;
-    while ((match = regXOverNumberWithPower.exec(expression)) != null) {
-        numertor = match[1];
-        denominator = match[2];
-        power = match[3];
-        if (numertor == null) numertor = 1;
-            expression = expression.replace(
-                '(' + numertor + 'x/' + denominator + ')^' + power,
-                Math.pow(numertor, power) + '/' + Math.pow(denominator, power) + 'x^' + power
-            );
-    }
+//     let match;
+//     let numertor = 0;
+//     let denominator = 0;
+//     let power = 0;
+//     while ((match = regXOverNumberWithPower.exec(expression)) != null) {
+//         numertor = match[1];
+//         denominator = match[2];
+//         power = match[3];
+//         if (numertor == null) numertor = 1;
+//             expression = expression.replace(
+//                 '(' + numertor + 'x/' + denominator + ')^' + power,
+//                 Math.pow(numertor, power) + '/' + Math.pow(denominator, power) + 'x^' + power
+//             );
+//     }
 
-    const regXOverNumberWithoutPower = /(\d*)x\/(\d+)/g;
-
-
-    while ((match = regXOverNumberWithoutPower.exec(expression)) != null) {
-        numertor = match[1];
-        if (numertor == null) numertor = 1;
-        denominator = match[2];
-        expression = expression.replace(regXOverNumberWithoutPower, numertor + '/' + denominator + 'x');
-    }
-
-    return expression;
-}
+//     const regXOverNumberWithoutPower = /(\d*)x\/(\d+)/g;
 
 
-function getPolynomialWithX(expression) {
+//     while ((match = regXOverNumberWithoutPower.exec(expression)) != null) {
+//         numertor = match[1];
+//         if (numertor == null) numertor = 1;
+//         denominator = match[2];
+//         expression = expression.replace(regXOverNumberWithoutPower, numertor + '/' + denominator + 'x');
+//     }
 
-    let cObj = {
-        coef: [],
-        c: 0
-    };
+//     return expression;
+// }
 
-    let pObj = {
-        powers: [],
-        p: 0
-    };
 
-    let sObj = {
-        signs: [],
-        s: 0
-    };
+// function getPolynomialWithX(expression) {
 
-    expression = xOverNumber(expression);
-    expression = (processQuotients(expression));
+//     let cObj = {
+//         coef: [],
+//         c: 0
+//     };
 
-    let match;
-    while ((match = extractXReg.exec(expression)) != null) {
+//     let pObj = {
+//         powers: [],
+//         p: 0
+//     };
 
-        if (match[1] == null) {
-            sObj.signs[sObj.s++] = '';
-        } else sObj.signs[sObj.s++] = match[1];
+//     let sObj = {
+//         signs: [],
+//         s: 0
+//     };
 
-        if (match[2] == null) {
-            cObj.coef[cObj.c++] = 1;
-        } else cObj.coef[cObj.c++] = match[2];
-        if (match[3] == null) {
-            pObj.powers[pObj.p++] = 1;
-        } else pObj.powers[pObj.p++] = match[3];
+//     expression = xOverNumber(expression);
+//     expression = (processQuotients(expression));
 
-    }
+//     let match;
+//     while ((match = extractXReg.exec(expression)) != null) {
 
-    return {
-        "cObj": cObj,
-        "pObj": pObj,
-        "sObj": sObj
-    };
-}
+//         if (match[1] == null) {
+//             sObj.signs[sObj.s++] = '';
+//         } else sObj.signs[sObj.s++] = match[1];
 
-function getNumbers(expression) {
+//         if (match[2] == null) {
+//             cObj.coef[cObj.c++] = 1;
+//         } else cObj.coef[cObj.c++] = match[2];
+//         if (match[3] == null) {
+//             pObj.powers[pObj.p++] = 1;
+//         } else pObj.powers[pObj.p++] = match[3];
 
-    expression = xOverNumber(expression);
-    expression = processQuotients(expression);
+//     }
 
-  let numbersInExpression = expression.replace(
-    extractXReg, 
-    ''
-    );
+//     return {
+//         "cObj": cObj,
+//         "pObj": pObj,
+//         "sObj": sObj
+//     };
+// }
 
-    let sObj = {signs: [], s: 0};
-    let nObj = {numbers: [], n: 0};
+// function getNumbers(expression) {
 
-    let match;
+//     expression = xOverNumber(expression);
+//     expression = processQuotients(expression);
 
-    while ((match = extractNumberReg.exec(numbersInExpression)) != null) {
+//   let numbersInExpression = expression.replace(
+//     extractXReg, 
+//     ''
+//     );
 
-      if (match[1] == null) {
-        sObj.signs[sObj.s++] = '';
-      } else sObj.signs[sObj.s++] = match[1];
+//     let sObj = {signs: [], s: 0};
+//     let nObj = {numbers: [], n: 0};
 
-      nObj.numbers[nObj.n++] = match[2];
-    }
+//     let match;
 
-    return {"sObj": sObj, "nObj": nObj};
-}
+//     while ((match = extractNumberReg.exec(numbersInExpression)) != null) {
+
+//       if (match[1] == null) {
+//         sObj.signs[sObj.s++] = '';
+//       } else sObj.signs[sObj.s++] = match[1];
+
+//       nObj.numbers[nObj.n++] = match[2];
+//     }
+
+//     return {"sObj": sObj, "nObj": nObj};
+// }
 
 
 function simplify(expression) { 

@@ -1,7 +1,7 @@
-// TO REFACTOR
+
 const extractXReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)*x\^*(\d+)*\s*/g;
 const extractNumberReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)\s*/g;
-//
+
 
 const functionDatabase = [
     '-2x+x^5-x^4-x^2-18',  '-2x^4+x^2-10',       '-x^3-x^2-11',
@@ -71,7 +71,7 @@ const functionDatabase = [
   ];
 
 /**
- * Store two instansese of the expression -- decimal and fractional one (maybe two different simplify functions will be used)
+ * Store two instansese of the expression -- decimal and fractional one !!! (maybe two different simplify functions will be used) !!!
  * Then in a loop compare user's simplified unit of the answer with two units of 
  * the correct answer. If there is a match -- count it as correct.
  * 
@@ -85,6 +85,7 @@ const functionDatabase = [
 //
 //LOW-LEVEL EXTRACTORS HELPERS
 //
+
 function processXOverNumber(expression) {
 
     const regXOverNumberWithPower = /\((\d+)*x\/(\d+)\)\^(\d+)/g;
@@ -124,7 +125,8 @@ function processXOverNumber(expression) {
  //
  // LOW-LEVEL EXTRACTORS
  //
-function getPolynomialsWithX(expression) {
+ 
+function getPolynomialWithX(expression) {
 
     expression = processXOverNumber(expression);
 
@@ -192,11 +194,15 @@ function getNumbers(expression) {
     return {"sObj": sObj, "nObj": nObj};
 }
 
+//
+//
+//
+
 // 
 // HIGH-LEVEL EXTRACTORS
 //
 
-function expressionInDecimals(expression) {
+function getExpressionInDecimals(expression) {
 
     const reg = /(\d+)\/(\d+)/g;
 
@@ -219,16 +225,243 @@ function expressionInDecimals(expression) {
     return expression;
 }
 
-console.log(expressionInDecimals('-0.25x^3-1/2x^2+14x+15.234'))
 
-function expressionInFractions(expression) {
+function getExpressionInFractions(expression) {
+
+    const reg = /\d+\.\d+/g;
+
+
+    let match;
+    let decimalNumbers = [];
+    let DN = 0;
+    while((match = reg.exec(expression)) != null) {
+        decimalNumbers[DN++] = match;
+    }
+
+    let decimalPlaces = 0;
+    let decimalPart = 0;
+    let intPart = 0;
+    let fractions = [];
+    for (let i = 0; i < decimalNumbers.length; i++) {
+        decimalPlaces = decimalNumbers[i].toString().split('.')[1].length;
+        decimalPart = decimalNumbers[i].toString().split('.')[1];
+        intPart = decimalNumbers[i].toString().split('.')[0];
+        if (intPart == 0) intPart = '';
+        fractions[i] = intPart + '' + decimalPart + '/' + Math.pow(10, decimalPlaces);
+        expression = expression.replace(decimalNumbers[i], fractions[i]);
+    }
+
+    return expression;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function simplify1(expression) {
+
+    let decimalExpression = getExpressionInDecimals(expression);
+    let decimalExpressionWithX = getPolynomialWithX(deceimalExpression);
+    let coefsOfXDecimal = decimalExpressionWithX.cObj.coef;
+    let powersOfXDecimal = decimalExpressionWithX.pObj.powers;
+    let signsOfXDecimal = decimalExpressionWithX.sObj.signs;
+    let decimalExpressionWithNumbers = getNumbers(expression);
+    let numbersDecimal = decimalExpressionWithNumbers.nObj.numbers;
+    let signsOfNumbersDecimal = decimalExpressionWithNumbers.sObj.signs;
+
+    signsOfXDecimal = turnNullToPlus(signsOfXDecimal);
+    signsOfNumbersDecimal = turnNullToPlus(signsOfNumbersDecimal);
+
+
+    let fractionalExpression = getExpressionInFractions(expression);
+    let fractionalExpressionWithX = getPolynomialWithX(expression);
+    let coefsOfXFractional = fractionalExpressionWithX.cObj.coef;
+    let powersOfXFractional = fractionalExpressionWithX.pObj.powers;
+    let signsOfXFractional = fractionalExpressionWithX.sObj.signs;
+    let fractionalExpressionWithNumbers = getNumbers(expression);
+    let numbersFractional = fractionalExpressionWithNumbers.nObj.numbers;
+    let signsOfNumbersFractional = fractionalExpressionWithNumbers.sObj.signs;
+
+    signsOfXFractional = turnNullToPlus(signsOfXFractional);
+    signsOfNumbersFractional = turnNullToPlus(signsOfNumbersFractional);
 
 }
+
+function simplify(expression) { 
+
+    let xExtractor = getPolynomialWithX(expression);
+    let coefsOfX = xExtractor.cObj.coef;
+    let powersOfX = xExtractor.pObj.powers;
+    let signsOfX = xExtractor.sObj.signs;
+
+    let numberExtractor = getNumbers(expression);
+    let numbers = numberExtractor.nObj.numbers;
+    let signsOfNumbers = numberExtractor.sObj.signs; // passes no sign as ''
+  
+    signsOfX = turnNullToPlus(signsOfX);
+    signsOfNumbers = turnNullToPlus(signsOfNumbers);
+
+    let simplifiedX = sumUpX(signsOfX, coefsOfX, powersOfX);
+    let simplifiedNumber = 0;
+
+    for (let i = 0; i < numbers.length; i++) {
+        if (signsOfNumbers[i] == '+') {
+            simplifiedNumber += Number(numbers[i]);
+        } else simplifiedNumber -= Number(numbers[i]);
+    }
+
+    let simplification = simplifiedX;
+
+    if (simplifiedNumber > 0) {
+        simplification += '+' + simplifiedNumber;
+    } else if (simplifiedNumber < 0) {
+        simplification += simplifiedNumber;
+    }
+
+    return simplification.replace(/^\+/, '');
+}
+  
+  function turnNullToPlus(signs) {
+    for (let i = 0; i < signs.length; i++) {
+      if (signs[i] == '') signs[i] = '+';
+    }
+    return signs;
+  }
+  
+
+  function getSamePowers(powersOfX) {
+
+    let equalPowersPositions = [];
+    let EPP = 0;
+    let equalPowers = [];
+    let EP = 0;
+
+    for (let i = 0; i < powersOfX.length; i++) {
+
+        let notChecked = true;
+        for (let k = 0; k < equalPowersPositions.length; k++) {
+            for (let l = 0; l < equalPowersPositions[k].length; l++) {
+                if (i == equalPowersPositions[k][l]) {
+                    notChecked = false;
+                    break;
+                }
+                
+            }
+        }
+        
+        let haveTheSamePowers = false;
+        let powersCollector = [];
+        let PC = 1;
+        if (notChecked) {
+            for (let j = i + 1; j < powersOfX.length; j++) {
+                if (powersOfX[i] == powersOfX[j]) {
+                    powersCollector[PC++] = j;
+                    haveTheSamePowers = true;
+                }
+            }
+            if (haveTheSamePowers) {
+                powersCollector[0] = i;
+                equalPowersPositions[EPP++] = powersCollector;
+                equalPowers[EP++] = powersOfX[i];
+            }
+        }
+    }
+
+    return {
+        "equalPowersPositions": equalPowersPositions, // returns 2D array
+        "equalPowers": equalPowers
+    }; 
+}
+
+function sumUpX(signsOfX, coefsOfX, powersOfX) {
+
+    let powersProcessor = getSamePowers(powersOfX);
+    let samePowersPositions = powersProcessor.equalPowersPositions; // 2D array
+    let powers = powersProcessor.equalPowers;
+
+    let sumedUpCoef = 0;
+
+    let simplified = '';
+
+    for (let i = 0; i < samePowersPositions.length; i++) {
+        for (let j = 0; j < samePowersPositions[i].length; j++) {
+            if (signsOfX[samePowersPositions[i][j]] == '+') {
+                sumedUpCoef += Number(coefsOfX[samePowersPositions[i][j]]);
+            } else sumedUpCoef -= Number(coefsOfX[samePowersPositions[i][j]]);
+        }
+
+        let sumedUpCoefIsZero = false;
+        if (sumedUpCoef == 0) sumedUpCoefIsZero = true;
+
+        if (!sumedUpCoefIsZero) {
+            let coefWithSign = '';
+            
+            if (sumedUpCoef > 0) {
+                if (sumedUpCoef == 1) {
+                    coefWithSign = '+';
+                } else coefWithSign = '+' + sumedUpCoef;
+            } else if (sumedUpCoef == -1) {
+                coefWithSign = '-';
+            } else coefWithSign = sumedUpCoef
+
+            if (powers[i] == 1) {
+                simplified += coefWithSign + 'x';
+            } else simplified += coefWithSign + 'x^' + powers[i];
+        }
+        
+        sumedUpCoef = 0;
+    }
+
+    let repetitiveCoefsPosition = [];
+    let RC = 0;
+    for (let i = 0; i < samePowersPositions.length; i++) {
+        for (let j = 0; j < samePowersPositions[i].length; j++) {
+            repetitiveCoefsPosition[RC++] = samePowersPositions[i][j];
+        }
+    }
+
+    let singleCoefsPosition = [];
+    let SC = 0;
+    for (let i = 0; i < coefsOfX.length; i++) {
+        let notProcessed = true;
+        for (let j = 0; j < repetitiveCoefsPosition.length; j++) {
+            if (i == repetitiveCoefsPosition[j]) {
+                notProcessed = false;
+                break;
+            }
+        }
+        if (notProcessed) {
+            singleCoefsPosition[SC++] = i;
+        }
+    }
+    let positionNumber = '';
+    for (let i = 0; i < singleCoefsPosition.length; i++) {
+        positionNumber = singleCoefsPosition[i];
+        if (powersOfX[positionNumber] == 1) {
+            simplified += signsOfX[positionNumber] + Number(coefsOfX[positionNumber]).toFixed(2) + 'x';
+        } else simplified += signsOfX[positionNumber] + Number(coefsOfX[positionNumber]).toFixed(2) + 'x^' + powersOfX[positionNumber];
+    }
+
+    return simplified;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function check(func) {
     for (let i = 0; i < functionDatabase.length; i++) {
-        process.stdout.write('Function ' + functionDatabase[i] + ' --> ');
+        process.stdout.write(functionDatabase[i] + ' --> ');
         console.log(func(functionDatabase[i]));
     }
 }
-
