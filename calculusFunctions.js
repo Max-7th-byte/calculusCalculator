@@ -777,8 +777,8 @@ function numbersNotEqual(
     }
 
     if (
-        Number(numberOfUserDecimal) != Number(correctNumberDecimal) || 
-        Number(numberOfUserFractional) != Number(correctNumberFractional)
+        Number(numberOfUserDecimal) == Number(correctNumberDecimal) || 
+        Number(numberOfUserFractional) == Number(correctNumberFractional)
         )
         {return false;} else return true;
 }
@@ -805,7 +805,12 @@ function processExpressionForCompare(expression) {
     return xExpression;
 }
 
-console.log(compareDerivatives('16x^3 + 1554/100', '4x^4 + 15.54x'));
+for (let i = 0; i < functionDatabase.length; i++) {
+    console.log(derivativeOf(functionDatabase[i]));
+    console.log(compareDerivatives(derivativeOf(functionDatabase[i]), functionDatabase[i]));
+}
+
+
 
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
