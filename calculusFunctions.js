@@ -1,4 +1,3 @@
-
 const extractXReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)*x\^*(\d+)*\s*/g;
 const extractNumberReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)\s*/g;
 
@@ -81,6 +80,145 @@ const functionDatabase = [
  * extractXReg and extractNumberReg will be rewritten as improved once, which will be capable of finding any type of number
  */
 
+
+//
+// MAIN FUNCTIONS
+//
+
+function derivativeOf(expression) {
+
+    if (!expression.includes('x')) {
+        return '0';
+    }
+
+    return derive(expression);
+}
+
+function derive(expression) {
+
+    let polynomials = getPolynomialWithX(expression);
+    let coefs = polynomials.cObj.coef;
+    let powers = polynomials.pObj.powers;
+    let signs = polynomials.sObj.signs;
+
+    let derivedExpressionArray = [];
+    let derivedPower = '';
+    let derivedCoef = '';
+
+    for (let i = 0; i < coefs.length; i++) {
+
+        derivedPower = powers[i] - 1;
+        derivedCoef = (coefs[i] * powers[i]);
+
+        switch (derivedPower) {
+            case 0:
+                derivedExpressionArray[i] = signs[i] + derivedCoef;
+                break;
+            case 1:
+                if (derivedCoef == 1) {
+                    derivedExpressionArray[i] = signs[i] + "x";
+                } else {
+                    derivedExpressionArray[i] = signs[i] + derivedCoef + "x";
+                }
+                break;
+            default:
+                if (derivedCoef == 1) {
+                    derivedExpressionArray[i] = signs[i] + "x^" + derivedPower;
+                } else derivedExpressionArray[i] = signs[i] + derivedCoef + "x^" + derivedPower;
+        }
+    }
+
+    let derivedExpression = '';
+    for (let i = 0; i < derivedExpressionArray.length; i++) {
+        derivedExpression += derivedExpressionArray[i];
+    }
+
+    return derivedExpression.replace(/^\+/m, '');
+}
+
+/**
+ * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
+ * and looks for x's with a power and ordinary numbers through out two
+ * separate functions: getPolynomialWithX and getNumbers
+ */
+
+function calculate(expression, value) {
+
+    let xExtractor = getPolynomialWithX(expression);
+    let signsOfX = xExtractor.sObj.signs; // passes no sign as ''
+    let coefsOfX = xExtractor.cObj.coef;
+    let powersOfX = xExtractor.pObj.powers;
+
+    let answer = 0;
+    let unit = 0;
+
+    for (let i = 0; i < coefsOfX.length; i++) {
+        unit = Number(coefsOfX[i] * Math.pow(value, powersOfX[i]));
+        if (signsOfX[i].toString() == '+' || signsOfX[i] == '') {
+            answer += unit;
+        } else if (signsOfX[i].toString() == '-') {
+            answer -= unit;
+        } else throw new Error('Misread sign of x');
+    }
+
+    let numberExtractor = getNumbers(expression);
+    let numbers = numberExtractor.nObj.numbers;
+    let signOfNumber = numberExtractor.sObj.signs; // passes no sign as ''
+
+    for (let i = 0; i < numbers.length; i++) {
+        if (signOfNumber[i].toString() == '+' || signOfNumber[i].toString() == '') {
+            answer += Number(numbers[i]);
+        } else if (signOfNumber[i].toString() == '-') {
+            answer -= Number(numbers[i]);
+        } else throw new Error('Misread sign of the number' + numbers[i]);
+    }
+
+    return answer.toString();
+}
+
+/**
+ * Takes an expression written in such a way: (x^2 + 4x^4 - 12)
+ * and looks for x's with a power and ordinary numbers through out two
+ * separate functions: getPolynomialWithX and getNumbers
+ * and returns indefinite integral as the answer
+ */
+
+function integralOf(expression) {
+
+    // WORKING ON X's
+
+    let xExtractor = getPolynomialWithX(expression);
+    let coefsOfX = xExtractor.cObj.coef;
+    let powersOfX = xExtractor.pObj.powers;
+    let signsOfX = xExtractor.sObj.signs; // passes no sign as ''
+
+    let integratedExpression = '';
+    let integratedPower;
+    let integratedUnit;
+    for (let i = 0; i < powersOfX.length; i++) {
+        integratedPower = Number(powersOfX[i]) + 1;
+        let integratedCoef = coefsOfX[i] + '/' + integratedPower; // Number((coefsOfX[i]/integratedPower).toFixed(2));
+        if (coefsOfX[i] / integratedPower == 1) {
+            integratedCoef = '';
+        }
+        integratedUnit = signsOfX[i] + integratedCoef + 'x^' + integratedPower;
+        integratedExpression += integratedUnit;
+    }
+
+    let answer = integratedExpression;
+
+    // WORKING ON NUMBERS
+
+    let numberExtractor = getNumbers(expression);
+    let numbers = numberExtractor.nObj.numbers;
+    let signsOfNumbers = numberExtractor.sObj.signs;
+    for (let i = 0; i < numbers.length; i++) {
+        let integralOfConst = signsOfNumbers[i] + numbers[i] + 'x';
+        answer += integralOfConst;
+    }
+
+    return answer.toString().replace(/\s/g, '');
+}
 
 //
 //LOW-LEVEL EXTRACTORS HELPERS
@@ -304,7 +442,9 @@ function getSamePowers(powersOfX) {
         let notChecked = true;
         for (let k = 0; k < equalPowersPositions.length; k++) {
             for (let l = 0; l < equalPowersPositions[k].length && notChecked; l++) {
-                if (i == equalPowersPositions[k][l]) {notChecked = false;}
+                if (i == equalPowersPositions[k][l]) {
+                    notChecked = false;
+                }
             }
         }
 
@@ -360,7 +500,7 @@ function sumUpSamePowersDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDeci
                 if (sumedUpCoef == -1) {
                     coefWithSign = '-';
                 } else coefWithSign = sumedUpCoef;
-            } 
+            }
 
             if (powers[i] == 1) {
                 simplified += coefWithSign + 'x';
@@ -372,7 +512,7 @@ function sumUpSamePowersDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDeci
 
     return {
         "simplified": simplified,
-        "samePowersPositions" : samePowersPositions
+        "samePowersPositions": samePowersPositions
     };
 }
 
@@ -390,7 +530,9 @@ function getSingleCoefPositions(samePowersPositions, coefsOfXDecimal) {
     for (let i = 0; i < coefsOfXDecimal.length; i++) {
         let notProcessed = true;
         for (let j = 0; j < repetitiveCoefsPosition.length && notProcessed; j++) {
-            if (i == repetitiveCoefsPosition[j]) {notProcessed = false;}
+            if (i == repetitiveCoefsPosition[j]) {
+                notProcessed = false;
+            }
         }
         if (notProcessed) {
             singleCoefsPosition[SC++] = i;
@@ -406,7 +548,7 @@ function sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) {
     let samePowersPositions = sumUpSamePowersDecimalsObj.samePowersPositions;
 
     let singleCoefsPosition = getSingleCoefPositions(samePowersPositions, coefsOfXDecimal);
-    
+
     let positionNumber = '';
     for (let i = 0; i < singleCoefsPosition.length; i++) {
         positionNumber = singleCoefsPosition[i];
@@ -434,14 +576,14 @@ function sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal) {
     } else if (simplifiedNumber < 0) {
         toReturn += simplifiedNumber;
     }
-    
+
     return toReturn;
 }
 
 function GCD(a, b) {
     let remainder;
     while (a > 0) {
-        remainder = b%a;
+        remainder = b % a;
         b = a;
         a = remainder;
     }
@@ -449,7 +591,7 @@ function GCD(a, b) {
 }
 
 function simplifyFractions(expression) {
-    
+
     const reg = /(\d+)\/(\d+)/g;
 
     let numerators = [];
@@ -471,7 +613,7 @@ function simplifyFractions(expression) {
     let fixedDenominator;
     for (let i = 0; i < numerators.length; i++) {
         for (let j = 0; j < numerators[i].toString().length && switched; j++) {
-           
+
             if (amountOfZeros >= 7) {
                 fixedNumerator = numerators[i].toString().substr(0, begining);
                 fixedDenominator = denominators[i].toString().substr(0, begining);
@@ -481,7 +623,10 @@ function simplifyFractions(expression) {
                 switched = false;
             }
             if (numerators[i].charAt(j) == '0') {
-                if (firstZero) {begining = j; firstZero = false} else amountOfZeros++;
+                if (firstZero) {
+                    begining = j;
+                    firstZero = false
+                } else amountOfZeros++;
             }
         }
 
@@ -512,28 +657,121 @@ function simplifyDecimals(expression) {
     let switched = true;
     for (let i = 0; i < decimalPlaces.length; i++) {
         for (let j = 0; j < decimalPlaces[i].length && switched; j++) {
-            
+
             if (amountOfZeros >= 7) {
                 expression = expression.replace(decimalPlaces[i], decimalPlaces[i].toString().substr(0, begining));
                 switched = false;
             }
 
             if (decimalPlaces[i].toString().charAt(j) == '0') {
-                if (firstZero) {begining = j; firstZero = false;} else amountOfZeros++;
-            } 
+                if (firstZero) {
+                    begining = j;
+                    firstZero = false;
+                } else amountOfZeros++;
+            }
         }
     }
 
     return expression
 }
 
+/////////////////////////////////////////////////////////////////
 
-
-
-
-function check(func) {
-    for (let i = 0; i < functionDatabase.length; i++) {
-        process.stdout.write(functionDatabase[i] + ' --> ');
-        console.log(func(functionDatabase[i]));
-    }
+function compareDerivatives(userAnswer, func) {
+    const correctDerivative = derivativeOf(func);
+    if (compare(userAnswer, correctDerivative)) {
+        return true;
+    } else return false;
 }
+
+function compareCalculations(userAnswer, func, value) {
+    const correctCalculation = calculate(func, value);
+    if (userAnswer == correctCalculation) {
+        return true;
+    } else return false;
+}
+
+function compareIntegrals(userAnswer, func) {
+    const correctIntegral = integralOf(func);
+    if (compare(userAnswer, correctIntegral)) {
+        return true;
+    } else return false;
+}
+
+//
+// MAIN COMPARE HEPLERS
+//
+
+function compare(userAnswer, correctAnswer) {
+
+    userAnswer = simplify(userAnswer);
+    correctAnswer = simplify(correctAnswer);
+
+    // processing number written by user
+    let numberOfUser = getNumbers(userAnswer).sObj.signs[0] + getNumbers(userAnswer).nObj.numbers[0];
+    let correctNumber = getNumbers(correctAnswer).sObj.signs[0] + getNumbers(correctAnswer).nObj.numbers[0];
+
+
+
+    if (isNaN(numberOfUser)) numberOfUser = 0;
+    if (isNaN(correctNumber)) correctNumber = 0;
+    if (numberOfUser != correctNumber) {
+        return false;
+    }
+    //
+
+    const usersExpressionX = processExpressionForCompare(userAnswer);
+    const correctExpressionX = processExpressionForCompare(correctAnswer);
+    if (usersExpressionX.length != correctExpressionX.length) return false;
+
+    let expressionsAreEqual = false;
+
+    let numberOfElementsRemaining = usersExpressionX.length;
+    for (let i = 0; i < usersExpressionX.length; i++) {
+        for (let j = 0; j < correctExpressionX.length; j++) {
+            if (usersExpressionX[i] == correctExpressionX[j]) {
+                numberOfElementsRemaining--;
+            }
+        }
+    }
+
+    if (numberOfElementsRemaining == 0) {
+        expressionsAreEqual = true;
+    }
+
+    return expressionsAreEqual;
+}
+
+function processExpressionForCompare(expression) {
+
+    const xExtractor = getPolynomialWithX(simplify(expression));
+
+    let xExpression = [];
+
+    for (let i = 0; i < xExtractor.cObj.coef.length; i++) {
+        let coef = xExtractor.cObj.coef[i];
+        if (coef == 1) coef = '';
+
+        let power = xExtractor.pObj.powers[i];
+        if (power == 1) power = 'x';
+        else power = 'x^' + power;
+
+        let sign = xExtractor.sObj.signs[i];
+        if (sign == '') sign = '+';
+        xExpression[i] = sign + coef + power;
+    }
+
+    return xExpression;
+}
+
+
+
+
+
+
+// function check(func) {
+//     for (let i = 0; i < functionDatabase.length; i++) {
+//         process.stdout.write(functionDatabase[i] + ' --> ');
+//         console.log(func(functionDatabase[i]));
+//     }
+// }
