@@ -502,26 +502,26 @@
 //     return simplified;
 // }
 
-  function compareDerivatives(userAnswer, func) {
-    const correctDerivative = derivativeOf(func);
-    if (compare(userAnswer, correctDerivative)) {
-        return true;
-    } else return false;
-  }
+//   function compareDerivatives(userAnswer, func) {
+//     const correctDerivative = derivativeOf(func);
+//     if (compare(userAnswer, correctDerivative)) {
+//         return true;
+//     } else return false;
+//   }
   
-  function compareCalculations(userAnswer, func, value) {
-    const correctCalculation = calculate(func, value);
-    if (userAnswer == correctCalculation) {
-      return true;
-    } else return false;
-  }
+//   function compareCalculations(userAnswer, func, value) {
+//     const correctCalculation = calculate(func, value);
+//     if (userAnswer == correctCalculation) {
+//       return true;
+//     } else return false;
+//   }
   
-  function compareIntegrals(userAnswer, func) {
-    const correctIntegral = integralOf(func);
-    if (compare(userAnswer, correctIntegral)) {
-      return true;
-    } else return false;
-  }
+//   function compareIntegrals(userAnswer, func) {
+//     const correctIntegral = integralOf(func);
+//     if (compare(userAnswer, correctIntegral)) {
+//       return true;
+//     } else return false;
+//   }
 
 // COMPARE HELPERS
 

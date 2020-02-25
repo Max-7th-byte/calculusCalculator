@@ -348,6 +348,8 @@ function getNumbers(expression) {
 
 function getExpressionInDecimals(expression) {
 
+    expression = processXOverNumber(expression);
+
     const reg = /(\d+)\/(\d+)/g;
 
     let numerators = [];
@@ -407,7 +409,7 @@ function simplify(expression) {
     let coefsOfXDecimal = decimalExpressionWithX.cObj.coef;
     let powersOfXDecimal = decimalExpressionWithX.pObj.powers;
     let signsOfXDecimal = decimalExpressionWithX.sObj.signs;
-    let decimalExpressionWithNumbers = getNumbers(expression);
+    let decimalExpressionWithNumbers = getNumbers(decimalExpression);
     let numbersDecimal = decimalExpressionWithNumbers.nObj.numbers;
     let signsOfNumbersDecimal = decimalExpressionWithNumbers.sObj.signs;
 
@@ -764,11 +766,28 @@ function processExpressionForCompare(expression) {
     return xExpression;
 }
 
+function ch(func) {
+    console.log(func);
+    console.log(simplify(func).simplifiedDecimal);
+    console.log(simplify(func).simplifiedFractional);
+}
 
 
+ch('3/4x^2 - 12 + 24/4 - 5/20x^4 - (3x/2)^2 + 0.36x^4');
 
-
-
+const _derivativeOf = derivativeOf;
+export { _derivativeOf as derivativeOf };
+const _calculate = calculate;
+export { _calculate as calculate };
+const _integralOf = integralOf;
+export { _integralOf as integralOf };
+const _compareDerivatives = compareDerivatives;
+export { _compareDerivatives as compareDerivatives };
+const _compareCalculations = compareCalculations;
+export { _compareCalculations as compareCalculations };
+const _compareIntegrals = compareIntegrals;
+export { _compareIntegrals as compareIntegrals };
+ 
 // function check(func) {
 //     for (let i = 0; i < functionDatabase.length; i++) {
 //         process.stdout.write(functionDatabase[i] + ' --> ');
