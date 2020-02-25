@@ -4,71 +4,71 @@ const extractNumberReg = /\s*([\+|-]*)\s*(\d+\/\d+|\d+\.\d+|\d+)\s*/g;
 
 
 const functionDatabase = [
-    '-2x+x^5-x^4-x^2-18',  '-2x^4+x^2-10',       '-x^3-x^2-11',
-    '-x^4+x^3-x^5+22',     '-2x^3+x^2-16',       '-2x^5+x^4+17',
-    '-2x^3-x^5-9',         '2x^2-2x^3+25',       '2x^2-x^3-x^4-x-12',
-    '2x-2x^3+x^2-32',      '-x^4-x^2+x^5-23',    '-x^2-x^4-x-17',
-    '-2x^2+x^4-28',        'x^4-x^2-x^5-17',     '-2x^2-x^4-24',
-    '-2x^4-x^3-15',        '-3x^4+x^3-27',       '2x^3-x^4-x^5-14',
-    '-x-x^3+x^2-16',       '-2x-2x^2+x^5-12',    'x^2-x^4-x^3+20',
-    '-x^4-x^3-13',         '2x^2-2x-x^4+15',     '-x^3-x^4+14',
-    '-2x^4+x^2-x^5-12',    '-x^4-x^3-20',        '2x^3-x^4+12',
-    '-x^4+x^2-x^3-18',     '-2x^2+x^4-14',       '-2x+x^3-x^2+x^4+21',
-    '-2x^2+x^5-30',        '-2x^5-x^4-8',        '-x^5-x^3-21',
-    '-3x^2+x^5-x^4-10',    '-2x^4+x^2-x^5-9',    '-x^4+x^3-x^2-8',
-    '2x^2-2x^4+13',        '-2x^2+x^4-20',       '-2x^4+x-x^2-x^3-26',
-    '-2x^2+x^3-21',        '-x^2-x^3-18',        '-2x^2-x^3-30',
-    '2x^4-x^2-20',         '-x^3+x^4-x^2-13',    '-2x^4+x^5-9',
-    '2x^5-x^2-x^4-x^3-18', 'x-x^5-x^3-2',        '-2x^4-x^3-19',
-    '2x^2+x^3-x^5-36',   '-x^2-x^3-x+14',        '-2x^2+x^4+x^3+29',
-    '-x^4+x^5-x^3-20',   '-2x^3+x^2+x^4-23',     '2x^5-2x^3+17',
-    '2x^4-x^2+18',       '-2x^2+x^3-24',         '-x^2-2x^3-21',
-    '-2x^5+x^2-x^4-x-7', '-x^3-2x^2+30',         '-3x^5+x^3-x^2-26',
-    '-2x^3+x^2-23',      '-x^4-2x^5-7',          '-3x^3+x^2-32',
-    '2x^5+x^2-16',       '2x^3-x-x^5-12',        '2x^4-2x^2-15',
-    '2x^4-x-x^3+8',      '2x^2-x^3-21',          '-2x^2+x^5-24',
-    '2x^4-2x^2-x^3-24',  '2x^4-2x^2-23',         '-2x^2+x^5+19',
-    '-2x^3+x^2-10',      '2x^3+x-x^2-26',        '-x^3-x^4-x^2-20',
-    '2x^5-2x^3-1',       '-x^2-x^5+x-4',         '2x^3-2x^5-x^2-16',
-    '-x^3-x^2+38',       'x^2-x+x^4-18',         '2x^4-x^2+x^3-5',
-    '-2x^2-x^3-6',       '-x^3-x^4-x^2+12',      '-3x^3+x^5+15',
-    '2x^4-x^5+24',       '-2x^4+x^3-x^5+30',     '-x^4-x^3-19',
-    '-x^2+x^3-13',       '-x^5-x^4+10',          '-x^3-x^4-12',
-    '-x-x^2-x^4-12',     'x^2+x^4+x+24',         '2x^5-x^2+20',
-    'x^4+x^2-x^3-20',    'x^2-2x^5-13',          '-x^2-2x^4-15', 
-    '-x^4+x^2+11',       '-2x^3+x^5-x^4-x^2-21', '2x^3-2x^4+x^5-26',
-    '-2x^3+x^2+x^5-32',  '-x^3-x^5-31',          '-x^2-x^5-19',
-    '-x^5-x^4-x-19',     '-2x^3-x^4+5',          'x^5-2x^2-15',
-    '-x-x^5-x^4-32',     '-2x^2+x-x^3+21',       '-2x^3+x^4-x^2-29',
-    '2x^3-x^5+x^4-x-12', '-2x^5+x^2-22',         '-2x-2x^4+x^3-23',
-    '-2x^3+x^2-27',      '-2x^3+x^2+x+x^5-29',   '2x^4-x^2-x^3+21',
-    '-3x^4+x^2-x^3+26',  '2x^5-x^2-x-x^3-3',     '-2x^2+x^3+9',
-    '-2x^5-x^2-8',       '-2x^2+x-x^3-37',       '-3x^3+x^5+x-25',
-    '-2x^2+x^3-x^4-38',  '-x^4-x-x^3-11',        '-x^3-x^4+34',
-    '-x^4-2x^2+17',      '-2x^5+x^3-x^4-x-19',   '-x^2+x^4-x^5-25',
-    'x+x^4-x^5-17',      '-2x^3+x^5-9',          '-2x^4+x^3-24',
-    '-2x^4+x^5+x^2-29',  '-x^3+x-x^5-18',        'x^4-x^2-x-17',
-    '-x^3+x^4-x^5+10',   '-x^2+x^4-x^3+25',      '-x^3-x^5-19',
-    '-3x^2+x^3+x-25',    '2x^2-3x^4-17',         '-2x^4+x^2-x^3-x-29',
-    '2x^5-x^4-11',        '-x+x^4-x^3-17',       '-2x-2x^2+x^4-29',
-    '-x^5+x^4-16',        '-2x^3+x^2-x^5-24',    '-x^2-x^4+x^3-4',
-    'x^3-2x^2+22',        '-2x^4+x^5+36',        '3x^3-x^2+31',
-    '-x^2+x^4-x^5-24',    '-2x^2-x^4-15',        '-x^2-x^3-19',
-    '-2x+x^4+x^2-23',     '2x-x^3-x^2-x^5-5',    '-2x^2+x^4-x^3+x-8',
-    '2x^5-x^3-13',        '-x^2-x^3-x^4-20',     '2x^4+x^2-x-27',
-    '-3x+x^5+x^2-32',     '-2x^2+x^5+x-x^4-24',  '-2x^2+x^4-x-x^5-16',
-    'x-x^4-x^5+21',       '2x^2-2x^4-x^3-18',    '2x^2-2x^5-x-13',
-    '2x^4-2x^5-x^2-12',   '-x^2-x^4-x-19',       '-2x^2+2x^3+x^5-18',
-    '-2x+x^4+x^2-x^3-13', '2x^2+x^4-x^3-22',     '-2x^3-x^5-11',
-    '-2x^3+x^2-26',       '-2x^3-x^4-7',         '-2x^5+x^2-29',
-    '-x^4+x^2-x-2',       '-2x^2-x^4-3',         '-2x^3+x^4-32',
-    '-2x+x^5-x^3-18',     '2x^4+x^2-x-16',       'x^3-x^5-x^4-5',
-    '-x+x^5-x^2-10',      'x^5-x-x^3-31',        '-2x^5+x^4-x^2-27',
-    '-2x^2-x^4-18',       'x^3-x^2-x^4-7',       '-2x^2-x^3+16',
-    '-2x^4+x^5-14',       '-2x^2+x^3-24',        '-2x^2+x^3+31',
-    '-x^4-x^5-11',        '-2x^4+x^2-22',        '-2x^3+x^2-21',
+    '-2x+x^5-x^4-x^2-18', '-2x^4+x^2-10', '-x^3-x^2-11',
+    '-x^4+x^3-x^5+22', '-2x^3+x^2-16', '-2x^5+x^4+17',
+    '-2x^3-x^5-9', '2x^2-2x^3+25', '2x^2-x^3-x^4-x-12',
+    '2x-2x^3+x^2-32', '-x^4-x^2+x^5-23', '-x^2-x^4-x-17',
+    '-2x^2+x^4-28', 'x^4-x^2-x^5-17', '-2x^2-x^4-24',
+    '-2x^4-x^3-15', '-3x^4+x^3-27', '2x^3-x^4-x^5-14',
+    '-x-x^3+x^2-16', '-2x-2x^2+x^5-12', 'x^2-x^4-x^3+20',
+    '-x^4-x^3-13', '2x^2-2x-x^4+15', '-x^3-x^4+14',
+    '-2x^4+x^2-x^5-12', '-x^4-x^3-20', '2x^3-x^4+12',
+    '-x^4+x^2-x^3-18', '-2x^2+x^4-14', '-2x+x^3-x^2+x^4+21',
+    '-2x^2+x^5-30', '-2x^5-x^4-8', '-x^5-x^3-21',
+    '-3x^2+x^5-x^4-10', '-2x^4+x^2-x^5-9', '-x^4+x^3-x^2-8',
+    '2x^2-2x^4+13', '-2x^2+x^4-20', '-2x^4+x-x^2-x^3-26',
+    '-2x^2+x^3-21', '-x^2-x^3-18', '-2x^2-x^3-30',
+    '2x^4-x^2-20', '-x^3+x^4-x^2-13', '-2x^4+x^5-9',
+    '2x^5-x^2-x^4-x^3-18', 'x-x^5-x^3-2', '-2x^4-x^3-19',
+    '2x^2+x^3-x^5-36', '-x^2-x^3-x+14', '-2x^2+x^4+x^3+29',
+    '-x^4+x^5-x^3-20', '-2x^3+x^2+x^4-23', '2x^5-2x^3+17',
+    '2x^4-x^2+18', '-2x^2+x^3-24', '-x^2-2x^3-21',
+    '-2x^5+x^2-x^4-x-7', '-x^3-2x^2+30', '-3x^5+x^3-x^2-26',
+    '-2x^3+x^2-23', '-x^4-2x^5-7', '-3x^3+x^2-32',
+    '2x^5+x^2-16', '2x^3-x-x^5-12', '2x^4-2x^2-15',
+    '2x^4-x-x^3+8', '2x^2-x^3-21', '-2x^2+x^5-24',
+    '2x^4-2x^2-x^3-24', '2x^4-2x^2-23', '-2x^2+x^5+19',
+    '-2x^3+x^2-10', '2x^3+x-x^2-26', '-x^3-x^4-x^2-20',
+    '2x^5-2x^3-1', '-x^2-x^5+x-4', '2x^3-2x^5-x^2-16',
+    '-x^3-x^2+38', 'x^2-x+x^4-18', '2x^4-x^2+x^3-5',
+    '-2x^2-x^3-6', '-x^3-x^4-x^2+12', '-3x^3+x^5+15',
+    '2x^4-x^5+24', '-2x^4+x^3-x^5+30', '-x^4-x^3-19',
+    '-x^2+x^3-13', '-x^5-x^4+10', '-x^3-x^4-12',
+    '-x-x^2-x^4-12', 'x^2+x^4+x+24', '2x^5-x^2+20',
+    'x^4+x^2-x^3-20', 'x^2-2x^5-13', '-x^2-2x^4-15',
+    '-x^4+x^2+11', '-2x^3+x^5-x^4-x^2-21', '2x^3-2x^4+x^5-26',
+    '-2x^3+x^2+x^5-32', '-x^3-x^5-31', '-x^2-x^5-19',
+    '-x^5-x^4-x-19', '-2x^3-x^4+5', 'x^5-2x^2-15',
+    '-x-x^5-x^4-32', '-2x^2+x-x^3+21', '-2x^3+x^4-x^2-29',
+    '2x^3-x^5+x^4-x-12', '-2x^5+x^2-22', '-2x-2x^4+x^3-23',
+    '-2x^3+x^2-27', '-2x^3+x^2+x+x^5-29', '2x^4-x^2-x^3+21',
+    '-3x^4+x^2-x^3+26', '2x^5-x^2-x-x^3-3', '-2x^2+x^3+9',
+    '-2x^5-x^2-8', '-2x^2+x-x^3-37', '-3x^3+x^5+x-25',
+    '-2x^2+x^3-x^4-38', '-x^4-x-x^3-11', '-x^3-x^4+34',
+    '-x^4-2x^2+17', '-2x^5+x^3-x^4-x-19', '-x^2+x^4-x^5-25',
+    'x+x^4-x^5-17', '-2x^3+x^5-9', '-2x^4+x^3-24',
+    '-2x^4+x^5+x^2-29', '-x^3+x-x^5-18', 'x^4-x^2-x-17',
+    '-x^3+x^4-x^5+10', '-x^2+x^4-x^3+25', '-x^3-x^5-19',
+    '-3x^2+x^3+x-25', '2x^2-3x^4-17', '-2x^4+x^2-x^3-x-29',
+    '2x^5-x^4-11', '-x+x^4-x^3-17', '-2x-2x^2+x^4-29',
+    '-x^5+x^4-16', '-2x^3+x^2-x^5-24', '-x^2-x^4+x^3-4',
+    'x^3-2x^2+22', '-2x^4+x^5+36', '3x^3-x^2+31',
+    '-x^2+x^4-x^5-24', '-2x^2-x^4-15', '-x^2-x^3-19',
+    '-2x+x^4+x^2-23', '2x-x^3-x^2-x^5-5', '-2x^2+x^4-x^3+x-8',
+    '2x^5-x^3-13', '-x^2-x^3-x^4-20', '2x^4+x^2-x-27',
+    '-3x+x^5+x^2-32', '-2x^2+x^5+x-x^4-24', '-2x^2+x^4-x-x^5-16',
+    'x-x^4-x^5+21', '2x^2-2x^4-x^3-18', '2x^2-2x^5-x-13',
+    '2x^4-2x^5-x^2-12', '-x^2-x^4-x-19', '-2x^2+2x^3+x^5-18',
+    '-2x+x^4+x^2-x^3-13', '2x^2+x^4-x^3-22', '-2x^3-x^5-11',
+    '-2x^3+x^2-26', '-2x^3-x^4-7', '-2x^5+x^2-29',
+    '-x^4+x^2-x-2', '-2x^2-x^4-3', '-2x^3+x^4-32',
+    '-2x+x^5-x^3-18', '2x^4+x^2-x-16', 'x^3-x^5-x^4-5',
+    '-x+x^5-x^2-10', 'x^5-x-x^3-31', '-2x^5+x^4-x^2-27',
+    '-2x^2-x^4-18', 'x^3-x^2-x^4-7', '-2x^2-x^3+16',
+    '-2x^4+x^5-14', '-2x^2+x^3-24', '-2x^2+x^3+31',
+    '-x^4-x^5-11', '-2x^4+x^2-22', '-2x^3+x^2-21',
     '-x+x^2-x^3-25'
-  ];
+];
 
 /**
  * Store two instansese of the expression -- decimal and fractional one !!! (maybe two different simplify functions will be used) !!!
@@ -103,7 +103,7 @@ function processXOverNumber(expression) {
             numerator = 1;
             unitToReplace = '(' + 'x/' + denominator + ')^' + power
         } else unitToReplace = '(' + numerator + 'x/' + denominator + ')^' + power;
-            
+
         expression = expression.replace(
             unitToReplace,
             Math.pow(numerator, power) + '/' + Math.pow(denominator, power) + 'x^' + power
@@ -122,10 +122,10 @@ function processXOverNumber(expression) {
     return expression;
 }
 
- //
- // LOW-LEVEL EXTRACTORS
- //
- 
+//
+// LOW-LEVEL EXTRACTORS
+//
+
 function getPolynomialWithX(expression) {
 
     expression = processXOverNumber(expression);
@@ -173,30 +173,36 @@ function getNumbers(expression) {
     expression = processXOverNumber(expression);
 
     let numbersInExpression = expression.replace(
-    extractXReg, 
-    ''
+        extractXReg,
+        ''
     );
 
-    let sObj = {signs: [], s: 0};
-    let nObj = {numbers: [], n: 0};
+    let sObj = {
+        signs: [],
+        s: 0
+    };
+    let nObj = {
+        numbers: [],
+        n: 0
+    };
 
     let match;
 
     while ((match = extractNumberReg.exec(numbersInExpression)) != null) {
 
-      if (match[1] == null) {
-        sObj.signs[sObj.s++] = '';
-      } else sObj.signs[sObj.s++] = match[1];
+        if (match[1] == null) {
+            sObj.signs[sObj.s++] = '';
+        } else sObj.signs[sObj.s++] = match[1];
 
-      nObj.numbers[nObj.n++] = match[2];
+        nObj.numbers[nObj.n++] = match[2];
     }
 
-    return {"sObj": sObj, "nObj": nObj};
+    return {
+        "sObj": sObj,
+        "nObj": nObj
+    };
 }
 
-//
-//
-//
 
 // 
 // HIGH-LEVEL EXTRACTORS
@@ -218,7 +224,7 @@ function getExpressionInDecimals(expression) {
 
     let decimals = [];
     for (let i = 0; i < numerators.length; i++) {
-        decimals[i] = Number(numerators[i]/denominators[i]);
+        decimals[i] = Number(numerators[i] / denominators[i]);
         expression = expression.replace(numerators[i] + '\/' + denominators[i], decimals[i]);
     }
 
@@ -230,11 +236,10 @@ function getExpressionInFractions(expression) {
 
     const reg = /\d+\.\d+/g;
 
-
     let match;
     let decimalNumbers = [];
     let DN = 0;
-    while((match = reg.exec(expression)) != null) {
+    while ((match = reg.exec(expression)) != null) {
         decimalNumbers[DN++] = match;
     }
 
@@ -257,10 +262,10 @@ function getExpressionInFractions(expression) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-function simplify1(expression) {
+function simplify(expression) {
 
     let decimalExpression = getExpressionInDecimals(expression);
-    let decimalExpressionWithX = getPolynomialWithX(deceimalExpression);
+    let decimalExpressionWithX = getPolynomialWithX(decimalExpression);
     let coefsOfXDecimal = decimalExpressionWithX.cObj.coef;
     let powersOfXDecimal = decimalExpressionWithX.pObj.powers;
     let signsOfXDecimal = decimalExpressionWithX.sObj.signs;
@@ -271,7 +276,8 @@ function simplify1(expression) {
     signsOfXDecimal = turnNullToPlus(signsOfXDecimal);
     signsOfNumbersDecimal = turnNullToPlus(signsOfNumbersDecimal);
 
-
+    let simplifiedDecimal = sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) + sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal);
+    
     let fractionalExpression = getExpressionInFractions(expression);
     let fractionalExpressionWithX = getPolynomialWithX(expression);
     let coefsOfXFractional = fractionalExpressionWithX.cObj.coef;
@@ -284,51 +290,22 @@ function simplify1(expression) {
     signsOfXFractional = turnNullToPlus(signsOfXFractional);
     signsOfNumbersFractional = turnNullToPlus(signsOfNumbersFractional);
 
+    let simplifiedFractional = sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFractional);
+
+    return {
+        "simplifiedDecimal": simplifiedDecimal,
+        "simplifiedFractional": simplifiedFractional
+    };
 }
 
-function simplify(expression) { 
-
-    let xExtractor = getPolynomialWithX(expression);
-    let coefsOfX = xExtractor.cObj.coef;
-    let powersOfX = xExtractor.pObj.powers;
-    let signsOfX = xExtractor.sObj.signs;
-
-    let numberExtractor = getNumbers(expression);
-    let numbers = numberExtractor.nObj.numbers;
-    let signsOfNumbers = numberExtractor.sObj.signs; // passes no sign as ''
-  
-    signsOfX = turnNullToPlus(signsOfX);
-    signsOfNumbers = turnNullToPlus(signsOfNumbers);
-
-    let simplifiedX = sumUpX(signsOfX, coefsOfX, powersOfX);
-    let simplifiedNumber = 0;
-
-    for (let i = 0; i < numbers.length; i++) {
-        if (signsOfNumbers[i] == '+') {
-            simplifiedNumber += Number(numbers[i]);
-        } else simplifiedNumber -= Number(numbers[i]);
-    }
-
-    let simplification = simplifiedX;
-
-    if (simplifiedNumber > 0) {
-        simplification += '+' + simplifiedNumber;
-    } else if (simplifiedNumber < 0) {
-        simplification += simplifiedNumber;
-    }
-
-    return simplification.replace(/^\+/, '');
-}
-  
-  function turnNullToPlus(signs) {
+function turnNullToPlus(signs) {
     for (let i = 0; i < signs.length; i++) {
-      if (signs[i] == '') signs[i] = '+';
+        if (signs[i] == '') signs[i] = '+';
     }
     return signs;
-  }
-  
+}
 
-  function getSamePowers(powersOfX) {
+function getSamePowers(powersOfX) {
 
     let equalPowersPositions = [];
     let EPP = 0;
@@ -344,10 +321,9 @@ function simplify(expression) {
                     notChecked = false;
                     break;
                 }
-                
             }
         }
-        
+
         let haveTheSamePowers = false;
         let powersCollector = [];
         let PC = 1;
@@ -369,48 +345,50 @@ function simplify(expression) {
     return {
         "equalPowersPositions": equalPowersPositions, // returns 2D array
         "equalPowers": equalPowers
-    }; 
+    };
 }
 
-function sumUpX(signsOfX, coefsOfX, powersOfX) {
-
-    let powersProcessor = getSamePowers(powersOfX);
+function sumUpSamePowersDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) {
+    let powersProcessor = getSamePowers(powersOfXDecimal);
     let samePowersPositions = powersProcessor.equalPowersPositions; // 2D array
     let powers = powersProcessor.equalPowers;
 
     let sumedUpCoef = 0;
 
     let simplified = '';
-
     for (let i = 0; i < samePowersPositions.length; i++) {
         for (let j = 0; j < samePowersPositions[i].length; j++) {
-            if (signsOfX[samePowersPositions[i][j]] == '+') {
-                sumedUpCoef += Number(coefsOfX[samePowersPositions[i][j]]);
-            } else sumedUpCoef -= Number(coefsOfX[samePowersPositions[i][j]]);
+            if (signsOfXDecimal[samePowersPositions[i][j]] == '+') {
+                sumedUpCoef += Number(coefsOfXDecimal[samePowersPositions[i][j]]);
+            } else sumedUpCoef -= Number(coefsOfXDecimal[samePowersPositions[i][j]]);
         }
 
-        let sumedUpCoefIsZero = false;
-        if (sumedUpCoef == 0) sumedUpCoefIsZero = true;
+        if (sumedUpCoef != 0) {
 
-        if (!sumedUpCoefIsZero) {
             let coefWithSign = '';
-            
-            if (sumedUpCoef > 0) {
-                if (sumedUpCoef == 1) {
-                    coefWithSign = '+';
-                } else coefWithSign = '+' + sumedUpCoef;
-            } else if (sumedUpCoef == -1) {
+            if (sumedUpCoef > 0 && sumedUpCoef == 1) {
+                coefWithSign = '+';
+            } else coefWithSign = '+' + sumedUpCoef;
+
+            if (sumedUpCoef < 0 && sumedUpCoef == -1) {
                 coefWithSign = '-';
-            } else coefWithSign = sumedUpCoef
+            } else coefWithSign = sumedUpCoef;
 
             if (powers[i] == 1) {
                 simplified += coefWithSign + 'x';
             } else simplified += coefWithSign + 'x^' + powers[i];
         }
-        
+
         sumedUpCoef = 0;
     }
 
+    return {
+        "simplified": simplified,
+        "samePowersPositions" : samePowersPositions
+    };
+}
+
+function getSingleCoefPositions(samePowersPositions, coefsOfXDecimal) {
     let repetitiveCoefsPosition = [];
     let RC = 0;
     for (let i = 0; i < samePowersPositions.length; i++) {
@@ -421,7 +399,7 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
 
     let singleCoefsPosition = [];
     let SC = 0;
-    for (let i = 0; i < coefsOfX.length; i++) {
+    for (let i = 0; i < coefsOfXDecimal.length; i++) {
         let notProcessed = true;
         for (let j = 0; j < repetitiveCoefsPosition.length; j++) {
             if (i == repetitiveCoefsPosition[j]) {
@@ -433,24 +411,53 @@ function sumUpX(signsOfX, coefsOfX, powersOfX) {
             singleCoefsPosition[SC++] = i;
         }
     }
+    return singleCoefsPosition;
+}
+
+function sumUpXDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal) {
+
+    let sumUpSamePowersDecimalsObj = sumUpSamePowersDecimals(signsOfXDecimal, coefsOfXDecimal, powersOfXDecimal);
+    let simplified = sumUpSamePowersDecimalsObj.simplified;
+    let samePowersPositions = sumUpSamePowersDecimalsObj.samePowersPositions;
+
+    let singleCoefsPosition = getSingleCoefPositions(samePowersPositions, coefsOfXDecimal);
+    
     let positionNumber = '';
     for (let i = 0; i < singleCoefsPosition.length; i++) {
         positionNumber = singleCoefsPosition[i];
-        if (powersOfX[positionNumber] == 1) {
-            simplified += signsOfX[positionNumber] + Number(coefsOfX[positionNumber]).toFixed(2) + 'x';
-        } else simplified += signsOfX[positionNumber] + Number(coefsOfX[positionNumber]).toFixed(2) + 'x^' + powersOfX[positionNumber];
+        if (powersOfXDecimal[positionNumber] == 1) {
+            simplified += signsOfXDecimal[positionNumber] + Number(coefsOfXDecimal[positionNumber]) + 'x';
+        } else simplified += signsOfXDecimal[positionNumber] + Number(coefsOfXDecimal[positionNumber]) + 'x^' + powersOfXDecimal[positionNumber];
     }
 
     return simplified;
 }
 
+function sumUpNumbersInDecimal(numbersDecimal, signsOfNumbersDecimal) {
+    let simplifiedNumber = 0;
+    let toReturn = '';
+    for (let i = 0; i < numbersDecimal.length; i++) {
+        if (signsOfNumbersDecimal[i] == '+') {
+            simplifiedNumber += Number(numbersDecimal[i]);
+        } else simplifiedNumber -= Number(numbersDecimal[i]);
+    }
 
+    if (simplifiedNumber > 0) {
+        toReturn = '+' + simplifiedNumber;
+    } else if (simplifiedNumber < 0) {
+        toReturn += simplifiedNumber;
+    }
+    
+    return toReturn;
+}
 
+function sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFractional) {
+    let powersProcessor = getSamePowers(powersOfXFractional);
+    let samePowersPositions = powersProcessor.equalPowersPositions; // 2D array
+    let powers = powersProcessor.equalPowers;
 
-
-
-
-
+    let sumedUpCoef = 0;
+}
 
 
 
