@@ -60,7 +60,7 @@ function derive(expression) {
 }
 
 
-console.log(derivativeOf('4x^2 + 5x^2 - 15x'));
+
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
  * and looks for x's with a power and ordinary numbers through out two
@@ -344,10 +344,10 @@ function simplify(expression) {
     signsOfX = turnNullToPlus(signsOfX);
     signsOfNumbers = turnNullToPlus(signsOfNumbers);
 
-    let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX));
+    let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX)) + simplifyFractions(sumUpNumbers(numbers, signsOfNumbers));
     let simplifiedDecimal = getExpressionInDecimals(simplifiedFractional);
 
-    
+
 
     return {
         "simplifiedFractional": simplifiedFractional,
@@ -355,8 +355,6 @@ function simplify(expression) {
     };
     
 }
-
-
 
 function turnNullToPlus(signs) {
     for (let i = 0; i < signs.length; i++) {
@@ -472,7 +470,10 @@ function sumFractions(signf1, f1, signf2, f2) {
         };
     }
 
-    return '';
+    return {
+        "signOfFraction": '',
+        "fraction": ''
+    };
 }
 
 function multiplyFractions(signf1, f1, signf2, f2) {
@@ -543,6 +544,8 @@ function sumUpSamePowersFractions(signsOfXFractions, coefsOfFractions, powersOfF
         }
         if (reg.exec(finalCoef)[1] != 0) {
 
+            if (finalSign == '-') finalSign = '';
+
             if (powers[i] == 1) {
                 simplified += finalSign + finalCoef + 'x';
             } else simplified += finalSign + finalCoef + 'x^' + powers[i];
@@ -572,6 +575,27 @@ function sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFracti
         }
     }
     return simplified;
+}
+
+function sumUpNumbers(numbers, signsOfNumbers) {
+    
+    let finalSign =  signsOfNumbers[0];
+    let finalNumber = numbers[0];
+    for (let i = 1; i < numbers.length; i++) {
+        let sumedUpFractionObj = sumFractions(
+            finalSign,
+            finalNumber,
+            signsOfNumbers[i],
+            numbers[i]
+        );
+        
+        finalSign = sumedUpFractionObj.signOfFraction;
+        finalNumber = sumedUpFractionObj.fraction;
+    }
+
+    if (finalSign == '-') finalSign = '';
+
+    return finalSign + finalNumber;
 }
 
 function GCD(a, b) {
