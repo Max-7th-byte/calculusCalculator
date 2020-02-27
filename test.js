@@ -59,7 +59,7 @@ function derive(expression) {
     return derivedExpression.replace(/^\+/, '');
 }
 
-
+console.log(simplify('1/2x^2 + 2x^2 + 4.5x^3 - 5/2x^2 + 5.2').simplifiedFractional);
 
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
@@ -277,13 +277,23 @@ function getExpressionInDecimals(expression) {
 
     const reg = /(\d+)\/(\d+)/g;
 
-    // WRITEE COMPLETETLY NEW ALGORYTHM
+    let numerators = [];
+    let N = 0;
+    let denominators = [];
+    let D = 0;
+
+    let match;
+    while ((match = reg.exec(expression)) != null) {
+        numerators[N++] = match[1];
+        denominators[D++] = match[2];
+    }
+
 
     return expression;
 }
 
 
-function getExpressionInFractions(expression) {
+function getExpressionInFractions(expression) { // I will have to rewrite expression from the scratch
     // processing decimals
     const reg = /\d+\.\d+/g;
 
@@ -307,23 +317,42 @@ function getExpressionInFractions(expression) {
 
         expression = expression.replace(decimalNumbers[i], fractions[i]);
     }
-    //processing integers
+    //processing integer coefs
     const coefs = getPolynomialWithX(expression).cObj.coef;
+    const signs = getPolynomialWithX(expression).sObj.signs;
+    const signsOfNumbers = getNumbers((expression)).sObj.signs;
+    const numbers = getNumbers(expression).nObj.numbers;
     let fractionalCoef;
+    let fractionalNumber;
     let units = expression.toString().split(/\s*\+\s*|\s*-\s*/);
-    let fixedUnits = expression.toString().split(/\s*\+\s*|\s*-\s*/);
-    for (let i = 0; i < coefs.length; i++) {
-        if (coefIsInteger(coefs[i])) {
-            fractionalCoef = coefs[i] + '/1';
-            fixedUnits[i] = fixedUnits[i].toString().replace(coefs[i], fractionalCoef);
-            expression = expression.toString().replace(units[i], fixedUnits[i]);
-        }
+    let newExpression = '';
+    for (let i = 0; i < units.length; i++) {
+        if (i == coefs.length) {
+            if (numberIsInteger(numbers[i-coefs.length])) {
+                fractionalNumber = number + '/1';
+                units[i] = units[i].toString().replace(number[i - coefs.length], fractionalNumber);
+            }
+            newExpression = newExpression + signsOfNumbers + units[i];
+        } else {
+            if (coefIsInteger(coefs[i])) {
+                fractionalCoef = coefs[i] + '/1';
+                units[i] = units[i].toString().replace(coefs[i], fractionalCoef);
+            }
+        
+            newExpression = newExpression + signs[i] + units[i];
+        }   
     }
-    return expression;
+
+    return newExpression.replace(/^\+/, '');
 }
 
 function coefIsInteger(coef) {
     if (!coef.toString().includes('.') && !coef.toString().includes('/')) return true;
+    else return false;
+}
+
+function numberIsInteger(number) {
+    if (!number.toString().includes('.') && !number.toString().includes('/')) return true;
     else return false;
 }
 
@@ -348,10 +377,9 @@ function simplify(expression) {
     let simplifiedDecimal = getExpressionInDecimals(simplifiedFractional);
 
 
-
     return {
-        "simplifiedFractional": simplifiedFractional,
-        "simplifiedDecimal": simplifiedDecimal
+        "simplifiedFractional": simplifiedFractional.replace(/^\+/, ''),
+        "simplifiedDecimal": simplifiedDecimal.replace(/^\+/,'')
     };
     
 }
@@ -594,6 +622,7 @@ function sumUpNumbers(numbers, signsOfNumbers) {
     }
 
     if (finalSign == '-') finalSign = '';
+    // if (isNaN(finalNumber)) return '';
 
     return finalSign + finalNumber;
 }
@@ -630,7 +659,9 @@ function simplifyFractions(expression) {
         let gcd = GCD(numerators[i], denominators[i]);
         fixedNumerator = Number(numerators[i]) / gcd;
         fixedDenominator = Number(denominators[i]) / gcd;
+
         if (fixedDenominator == 1) expression = expression.replace(numerators[i] + '/' + denominators[i], fixedNumerator);
+        
         expression = expression.replace(numerators[i] + '/' + denominators[i], fixedNumerator + '/' + fixedDenominator);
     }
 
@@ -641,9 +672,7 @@ function simplifyFractions(expression) {
 
 function compareDerivatives(userAnswer, func) {
     const correctDerivative = derivativeOf(func);
-    if (compare(userAnswer, correctDerivative)) {
-        return true;
-    } else return false;
+    return compare(userAnswer, correctDerivative);
 }
 
 function compareCalculations(userAnswer, func, value) {
@@ -655,9 +684,7 @@ function compareCalculations(userAnswer, func, value) {
 
 function compareIntegrals(userAnswer, func) {
     const correctIntegral = integralOf(func);
-    if (compare(userAnswer, correctIntegral)) {
-        return true;
-    } else return false;
+    return compare(userAnswer, correctIntegral)
 }
 
 //
