@@ -16,12 +16,12 @@ function derivativeOf(expression) {
 
 function derive(expression) {
 
-    let polynomials = getPolynomialWithX(getExpressionInFractions(expression));
+    let fractionalExpression = getExpressionInFractions(expression);
+    let polynomials = getPolynomialWithX(fractionalExpression);
     let coefs = polynomials.cObj.coef;
     let powers = polynomials.pObj.powers;
     let signs = polynomials.sObj.signs;
     signs = turnNullToPlus(signs);
-
     let derivedExpressionArray = [];
     let derivedPower = '';
     let derivedCoef = '';
@@ -29,8 +29,9 @@ function derive(expression) {
     for (let i = 0; i < coefs.length; i++) {
 
         derivedPower = Number(powers[i]) - 1;
-        derivedCoef = simplify(multiplyFractions(signs[i], coefs[i], '+', powers[i])).simplifiedFractional;
-
+        if (coefs[i] == 1) coefs[i] += '/1';
+        
+        derivedCoef = multiplyFractions(signs[i], coefs[i], '+', powers[i] + '/1');
         switch (derivedPower) {
             case 0:
                 derivedExpressionArray[i] = signs[i] + derivedCoef;
@@ -53,13 +54,13 @@ function derive(expression) {
     for (let i = 0; i < derivedExpressionArray.length; i++) {
         derivedExpression += derivedExpressionArray[i];
     }
+    derivedExpression = simplify(derivedExpression).simplifiedFractional;
 
     return derivedExpression.replace(/^\+/, '');
 }
 
 
-
-derivativeOf('x^3 - x^2')
+console.log(derivativeOf('4x^2 + 5x^2 - 15x'));
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
  * and looks for x's with a power and ordinary numbers through out two
@@ -283,8 +284,6 @@ function getExpressionInDecimals(expression) {
 
 
 function getExpressionInFractions(expression) {
-
-    console.log(expression);
     // processing decimals
     const reg = /\d+\.\d+/g;
 
@@ -310,12 +309,16 @@ function getExpressionInFractions(expression) {
     }
     //processing integers
     const coefs = getPolynomialWithX(expression).cObj.coef;
+    let fractionalCoef;
+    let units = expression.toString().split(/\s*\+\s*|\s*-\s*/);
+    let fixedUnits = expression.toString().split(/\s*\+\s*|\s*-\s*/);
     for (let i = 0; i < coefs.length; i++) {
         if (coefIsInteger(coefs[i])) {
-            expression = expression.replace(coefs[i], coefs[i] + '/1');
+            fractionalCoef = coefs[i] + '/1';
+            fixedUnits[i] = fixedUnits[i].toString().replace(coefs[i], fractionalCoef);
+            expression = expression.toString().replace(units[i], fixedUnits[i]);
         }
     }
-
     return expression;
 }
 
@@ -329,7 +332,7 @@ function coefIsInteger(coef) {
 
 function simplify(expression) {
 
-    let fractionalExpression = simplifyFractions(getExpressionInFractions(expression));
+    let fractionalExpression = getExpressionInFractions(expression);
     let expressionWithX = getPolynomialWithX(fractionalExpression);
     let coefsOfX = expressionWithX.cObj.coef;
     let powersOfX = expressionWithX.pObj.powers;
@@ -343,6 +346,8 @@ function simplify(expression) {
 
     let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX));
     let simplifiedDecimal = getExpressionInDecimals(simplifiedFractional);
+
+    
 
     return {
         "simplifiedFractional": simplifiedFractional,
@@ -557,14 +562,13 @@ function sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFracti
     let samePowersPositions = sumUpSamePowersDecimalsObj.samePowersPositions;
 
     let singleCoefsPositions = getSingleCoefPositions(samePowersPositions, coefsOfXFractional);
-
     let positionNumber;
     for (let i = 0; i < singleCoefsPositions.length; i++) {
         positionNumber = singleCoefsPositions[i];
         if (powersOfXFractional[positionNumber] == 1) {
             simplified += signsOfXFractional[positionNumber] + coefsOfXFractional[positionNumber] + 'x';
         } else {
-            simplified += signsOfXFractional[positionNumber] + Number(coefsOfXFractional[positionNumber]) + 'x^' + powersOfXFractional[positionNumber];
+            simplified += signsOfXFractional[positionNumber] + coefsOfXFractional[positionNumber] + 'x^' + powersOfXFractional[positionNumber];
         }
     }
     return simplified;
