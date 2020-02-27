@@ -59,7 +59,7 @@ function derive(expression) {
     return derivedExpression.replace(/^\+/, '');
 }
 
-console.log(simplify('1/2x^2 + 2x^2 + 4.5x^3 - 5/2x^2 + 5.2').simplifiedFractional);
+console.log(simplify('0.5x - 0.5x + 123x^123 - 123x^123').simplifiedFractional);
 
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
@@ -293,7 +293,7 @@ function getExpressionInDecimals(expression) {
 }
 
 
-function getExpressionInFractions(expression) { // I will have to rewrite expression from the scratch
+function getExpressionInFractions(expression) { 
     // processing decimals
     const reg = /\d+\.\d+/g;
 
@@ -319,30 +319,29 @@ function getExpressionInFractions(expression) { // I will have to rewrite expres
     }
     //processing integer coefs
     const coefs = getPolynomialWithX(expression).cObj.coef;
+    let c = 0;
     const signs = getPolynomialWithX(expression).sObj.signs;
     const signsOfNumbers = getNumbers((expression)).sObj.signs;
     const numbers = getNumbers(expression).nObj.numbers;
+    let n = 0;
     let fractionalCoef;
     let fractionalNumber;
     let units = expression.toString().split(/\s*\+\s*|\s*-\s*/);
     let newExpression = '';
     for (let i = 0; i < units.length; i++) {
-        if (i == coefs.length) {
-            if (numberIsInteger(numbers[i-coefs.length])) {
-                fractionalNumber = number + '/1';
-                units[i] = units[i].toString().replace(number[i - coefs.length], fractionalNumber);
-            }
-            newExpression = newExpression + signsOfNumbers + units[i];
+        if (units[i].toString().includes('x')) {
+            if (coefIsInteger(coefs[c])) {
+                fractionalCoef = coefs[c] + '/1';
+                units[i] = signs[c] + units[i].toString().replace(coefs[c++], fractionalCoef);
+            } else units[i] = signs[c++] + units[i];
         } else {
-            if (coefIsInteger(coefs[i])) {
-                fractionalCoef = coefs[i] + '/1';
-                units[i] = units[i].toString().replace(coefs[i], fractionalCoef);
-            }
-        
-            newExpression = newExpression + signs[i] + units[i];
-        }   
+            if (numberIsInteger(numbers[n])) {
+                fractionalNumber = numbers[n] + '/1';
+                units[i] = signsOfNumbers[n] + units[i].toString().replace(numbers[n++], fractionalNumber);
+            } else units[i] = signsOfNumbers[n++] + units[i];
+        }
+        newExpression += units[i];
     }
-
     return newExpression.replace(/^\+/, '');
 }
 
@@ -363,6 +362,7 @@ function simplify(expression) {
 
     let fractionalExpression = getExpressionInFractions(expression);
     let expressionWithX = getPolynomialWithX(fractionalExpression);
+    
     let coefsOfX = expressionWithX.cObj.coef;
     let powersOfX = expressionWithX.pObj.powers;
     let signsOfX = expressionWithX.sObj.signs;
@@ -374,6 +374,9 @@ function simplify(expression) {
     signsOfNumbers = turnNullToPlus(signsOfNumbers);
 
     let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX)) + simplifyFractions(sumUpNumbers(numbers, signsOfNumbers));
+    if (isNaN(simplifiedFractional)) {
+        simplifiedFractional = '';
+    }
     let simplifiedDecimal = getExpressionInDecimals(simplifiedFractional);
 
 
@@ -553,7 +556,6 @@ function sumUpSamePowersFractions(signsOfXFractions, coefsOfFractions, powersOfF
     let powersProcessor = getSamePowers(powersOfFractions);
     let samePowersPositions = powersProcessor.equalPowersPositions;
     let powers = powersProcessor.equalPowers;
-
     let simplified = '';
     for (let i = 0; i < samePowersPositions.length; i++) {
 
@@ -570,6 +572,12 @@ function sumUpSamePowersFractions(signsOfXFractions, coefsOfFractions, powersOfF
             finalSign = sumedUpFractionObj.signOfFraction;
             finalCoef = sumedUpFractionObj.fraction;
         }
+
+        if (finalCoef == '') return {
+            "simplified": '',
+            "samePowersPositions": samePowersPositions
+        };
+
         if (reg.exec(finalCoef)[1] != 0) {
 
             if (finalSign == '-') finalSign = '';
@@ -579,7 +587,6 @@ function sumUpSamePowersFractions(signsOfXFractions, coefsOfFractions, powersOfF
             } else simplified += finalSign + finalCoef + 'x^' + powers[i];
         }
     }
-
     return {
         "simplified": simplified,
         "samePowersPositions": samePowersPositions
