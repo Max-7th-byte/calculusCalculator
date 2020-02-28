@@ -141,7 +141,6 @@ function integralOf(expression) {
         let integralOfConst = signsOfNumbers[i] + numbers[i] + 'x';
         answer += integralOfConst;
     }
-    console.log(answer);
     answer = simplify(answer).simplifiedFractional;
 
     return answer.toString().replace(/\s/g, '');
@@ -276,28 +275,57 @@ function getNumbers(expression) {
 
 function getExpressionInDecimals(expression) {
 
-    expression = processXOverNumber(expression);
-    expression = getExpressionInFractions(expression);
+    const units = expression.split(/\s*\+\s*|\s*-\s*/);
+    if (units[0] == '') units.splice(0,1);
 
-    const reg = /(\d+)\/(\d+)/g;
+    const coefs = getPolynomialWithX(expression).cObj.coef;
+    const signsOfCoefs = getPolynomialWithX(expression).sObj.signs;
+    let c = 0;
 
-    let numerators = [];
-    let N = 0;
-    let denominators = [];
-    let D = 0;
+    const numbers = getNumbers(expression).nObj.numbers;
+    const singsOfNumbers = getNumbers(expression).sObj.signs;
+    let n = 0;
+    let newExpression = '';
+    for (let i = 0; i < units.length; i++) {
+        if (units[i].includes('x')) {
+            if (coefs[c] == 1) units[i] = '1' + units[i];
+            switch(numberType(coefs[c] )) {
+                case 'decimal': 
+                    units[i] = signsOfCoefs[c++] + units[i];
+                    break;
+                case 'integer':
+                    units[i] = signsOfCoefs[c++] + units[i];
+                    break;
+                case 'fraction':
+                    units[i] = signsOfCoefs[c] + units[i].replace(coefs[c], fractionToDecimal(coefs[c++]));
+                    break;
+            }
+        } else {
+            switch(numberType(units[i])) {
+                case 'decimal': 
+                    units[i] = singsOfNumbers[n] + numbers[n++];
+                    break;
+                case 'integer':
+                    units[i] = singsOfNumbers[n] + numbers[n++];
+                    break;
+                case 'fraction':
+                    units[i] = singsOfNumbers[n++] + units[i].replace(numbers[n], fractionToDecimal(numbers[n++]));
+                    break;
+            }
+        }
 
-    let match;
-    while ((match = reg.exec(expression)) != null) {
-        numerators[N++] = match[1];
-        denominators[D++] = match[2];
+        newExpression += units[i];
     }
 
-
-
-    return expression;
+    return newExpression;
 }
 
-function fractionToDecimal(numerator, denominator) {
+function fractionToDecimal(fraction) {
+
+    const reg = /(\d+)\/(\d+)/;
+
+    let numerator = reg.exec(fraction)[1];
+    let denominator = reg.exec(fraction)[2];
 
     numerator = Number(numerator);
     denominator = Number(denominator);
@@ -317,7 +345,21 @@ function fractionToDecimal(numerator, denominator) {
         maxNumberOfDecimalPlaces--;
     }
 
+    if (isTooBig(decimalValue)) {
+        decimalValue = Number(decimalValue).toFixed(2).toString();
+    }
+
     return decimalValue;
+}
+
+function isTooBig(number) {
+
+    let limit = 5
+    if (!number.toString().includes('.')) return false;
+    let decimalPlaces = number.toString().split('.')[1];
+    if (decimalPlaces.length > limit) {
+        return true;
+    }
 }
 
 function getExpressionInFractions(expression) {
@@ -415,7 +457,7 @@ function simplify(expression) {
     if (simplifiedFractional.includes('NaN')) {
         simplifiedFractional = '';
     }
-    let simplifiedDecimal = getExpressionInDecimals(fractional);
+    let simplifiedDecimal = getExpressionInDecimals(simplifiedFractional);
 
 
     return {
@@ -805,7 +847,7 @@ function numbersNotEqual(
 
     if (
         Number(numberOfUserDecimal) == Number(correctNumberDecimal) || 
-        Number(numberOfUserFractional) == Number(correctNumberFractional)
+        numberOfUserFractional == correctNumberFractional
         )
         {return false;} else return true;
 }
@@ -831,6 +873,8 @@ function processExpressionForCompare(expression) {
 
     return xExpression;
 }
+
+console.log(compareDerivatives('8600/1000x - 26x', '4.3x^2 - 13x^2'));
 
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
