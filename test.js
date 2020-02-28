@@ -59,8 +59,6 @@ function derive(expression) {
     return derivedExpression.replace(/^\+/, '');
 }
 
-console.log(integralOf('24x^2 - 40x^2 + 2x^3'));
-
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
  * and looks for x's with a power and ordinary numbers through out two
@@ -73,13 +71,14 @@ function calculate(expression, value) {
     let signsOfX = xExtractor.sObj.signs; 
     let coefsOfX = xExtractor.cObj.coef;
     let powersOfX = xExtractor.pObj.powers;
+    signsOfX = turnNullToPlus(signsOfX);
 
     let answer = 0;
     let unit = 0;
 
     for (let i = 0; i < coefsOfX.length; i++) {
         unit = Number(coefsOfX[i] * Math.pow(value, powersOfX[i]));
-        if (signsOfX[i].toString() == '+' || signsOfX[i] == '') {
+        if (signsOfX[i].toString() == '+') {
             answer += unit;
         } else if (signsOfX[i].toString() == '-') {
             answer -= unit;
@@ -112,7 +111,8 @@ function integralOf(expression) {
 
     // WORKING ON X's
 
-    let xExtractor = getPolynomialWithX(expression);
+    let fractionalExpression = getExpressionInFractions(expression);
+    let xExtractor = getPolynomialWithX(fractionalExpression);
     let coefsOfX = xExtractor.cObj.coef;
     let powersOfX = xExtractor.pObj.powers;
     let signsOfX = xExtractor.sObj.signs; 
@@ -122,11 +122,11 @@ function integralOf(expression) {
     let integratedUnit;
     for (let i = 0; i < powersOfX.length; i++) {
         integratedPower = Number(powersOfX[i]) + 1;
-        let integratedCoef = coefsOfX[i] + '/' + integratedPower;
-        if (coefsOfX[i] / integratedPower == 1) {
+        let integratedCoef = devideFractions(signsOfX[i], coefsOfX[i], '+', integratedPower);
+        if (integratedCoef == 1) {
             integratedCoef = '';
         }
-        integratedUnit = signsOfX[i] + integratedCoef + 'x^' + integratedPower;
+        integratedUnit = integratedCoef + 'x^' + integratedPower;
         integratedExpression += integratedUnit;
     }
 
@@ -134,19 +134,19 @@ function integralOf(expression) {
 
     // WORKING ON NUMBERS
 
-    let numberExtractor = getNumbers(expression);
+    let numberExtractor = getNumbers(fractionalExpression);
     let numbers = numberExtractor.nObj.numbers;
     let signsOfNumbers = numberExtractor.sObj.signs;
     for (let i = 0; i < numbers.length; i++) {
         let integralOfConst = signsOfNumbers[i] + numbers[i] + 'x';
         answer += integralOfConst;
     }
-
     answer = simplify(answer).simplifiedFractional;
 
     return answer.toString().replace(/\s/g, '');
 }
 
+console.log(integralOf('8x^3 - 4x^3'));
 //
 //LOW-LEVEL EXTRACTORS HELPERS
 //
@@ -276,6 +276,7 @@ function getNumbers(expression) {
 function getExpressionInDecimals(expression) {
 
     expression = processXOverNumber(expression);
+    expression = getExpressionInFractions(expression);
 
     const reg = /(\d+)\/(\d+)/g;
 
@@ -344,8 +345,8 @@ function getExpressionInFractions(expression) {
 
 function numberType(coef) {
 
-    if (coef.includes('.')) return 'decimal';
-    if (coef.includes('/')) return 'fraction';
+    if (coef.toString().includes('.')) return 'decimal';
+    if (coef.toString().includes('/')) return 'fraction';
     return 'integer';
 }
 
@@ -386,11 +387,12 @@ function simplify(expression) {
     signsOfX = turnNullToPlus(signsOfX);
     signsOfNumbers = turnNullToPlus(signsOfNumbers);
 
+    let fractional = sumUpXFractions(signsOfX, coefsOfX, powersOfX) + sumUpNumbers(numbers, signsOfNumbers);
     let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX)) + simplifyFractions(sumUpNumbers(numbers, signsOfNumbers));
     if (simplifiedFractional.includes('NaN')) {
         simplifiedFractional = '';
     }
-    let simplifiedDecimal = getExpressionInDecimals(simplifiedFractional);
+    let simplifiedDecimal = getExpressionInDecimals(fractional);
 
 
     return {
@@ -505,6 +507,7 @@ function sumUpSamePowersFractions(signsOfXFractions, coefsOfFractions, powersOfF
 
         if (reg.exec(finalCoef)[1] != 0) {
 
+            if (reg.exec(finalCoef)[1] == reg.exec(finalCoef)[2]) finalCoef = '';
             if (finalSign == '-') finalSign = '';
 
             if (powers[i] == 1) {
@@ -531,6 +534,7 @@ function sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFracti
         if (powersOfXFractional[positionNumber] == 1) {
             simplified += signsOfXFractional[positionNumber] + coefsOfXFractional[positionNumber] + 'x';
         } else {
+            if (coefsOfXFractional[positionNumber] == 1) coefsOfXFractional[positionNumber] = '';
             simplified += signsOfXFractional[positionNumber] + coefsOfXFractional[positionNumber] + 'x^' + powersOfXFractional[positionNumber];
         }
     }
@@ -653,7 +657,8 @@ function sumFractions(signf1, f1, signf2, f2) {
 function multiplyFractions(signf1, f1, signf2, f2) {
 
     const reg = /(\d+)\/(\d+)/;
-
+    if (signf1 == '') signf1 = '+';
+    if (signf2 == '') signf2 = '+';
     if (numberType(f1) == 'integer') f1 = f1 + '/1';
     if (numberType(f2) == 'integer') f2 = f2 + '/1';
     let numAndDenomf1 = reg.exec(f1);
@@ -668,7 +673,6 @@ function multiplyFractions(signf1, f1, signf2, f2) {
     if (signf1 == signf2) {
         finalNumerator = num1 * num2;
     } else finalNumerator = Number(-num1 * num2);
-
     if (finalNumerator == Number(denom1 * denom2)) return 1;
     if (Number(finalNumerator.toString().replace(/^-/, '')) == Number(denom1 * denom2)) return -1;
     if (finalNumerator < 0) finalNumerator = finalNumerator.toString().replace(/^-/, '');
@@ -677,11 +681,13 @@ function multiplyFractions(signf1, f1, signf2, f2) {
 
 function devideFractions(signf1, f1, signf2, f2) {
 
+    if (numberType(f2) == 'integer') f2 = f2 + '/1';
     const reg = /(\d+)\/(\d+)/;
     let numAndDenomf2 = reg.exec(f2);
     let num2 = Number(numAndDenomf2[1]);
     let denom2 = Number(numAndDenomf2[2]);
     f2 = denom2 + '/' + num2;
+    
 
     return multiplyFractions(signf1, f1, signf2, f2);
 }
