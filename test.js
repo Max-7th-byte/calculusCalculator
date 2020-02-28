@@ -59,7 +59,7 @@ function derive(expression) {
     return derivedExpression.replace(/^\+/, '');
 }
 
-console.log(derivativeOf('1/2x^2'));
+
 
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
@@ -293,8 +293,53 @@ function getExpressionInDecimals(expression) {
 }
 
 function getExpressionInFractionsNew(expression) {
+
     const units = expression.split(/\s*\+\s*|\s*-\s*/);
+
+    const coefs = getPolynomialWithX(expression).cObj.coef;
+    const signsOfCoefs = getPolynomialWithX(expression).sObj.signs;
+    let c = 0;
+
+    const numbers = getNumbers(expression).nObj.numbers;
+    const singsOfNumbers = getNumbers(expression).sObj.signs;
+    let n = 0;
+
+    let newExpression = '';
+    for (let i = 0; i < units.length; i++) {
+
+        if (units[i].includes('x')) {
+            switch(numberType(coefs[c])) {
+                case 'decimal': 
+                    units[i] = signsOfCoefs[c] + decimalToFraction(coefs[c++]);
+                    break;
+                case 'integer':
+                    units[i] = signsOfCoefs[c] + units[i].replace(coefs[c], integerToFraction(coefs[c++]));
+                    break;
+                case 'fraction':
+                    units[i] = signsOfCoefs[c] + units[i];
+                    break;
+            }
+        } else {
+            switch(numberType(units[i])) {
+                case 'decimal': 
+                    units[i] = singsOfNumbers[n] + decimalToFraction(numbers[n++]);
+                    break;
+                case 'integer':
+                    units[i] = singsOfNumbers[n] + integerToFraction(numbers[n++]);
+                    break;
+                case 'fraction':
+                    units[i] = singsOfNumbers[c] + units[i];
+                    break;
+            }
+        }
+
+        newExpression += units[i];
+    }
+
+    return newExpression;
 }
+
+console.log(getExpressionInFractionsNew('-2x'));
 
 function getExpressionInFractions(expression) { 
     // processing decimals
@@ -350,14 +395,35 @@ function getExpressionInFractions(expression) {
     return newExpression.replace(/^\+/, '');
 }
 
-function coefIsInteger(coef) {
-    if (!coef.toString().includes('.') && !coef.toString().includes('/')) return true;
-    else return false;
+function numberType(coef) {
+
+    if (coef.includes('.')) return 'decimal';
+    if (coef.includes('/')) return 'fraction';
+    return 'integer';
 }
 
 function numberIsInteger(number) {
     if (!number.toString().includes('.') && !number.toString().includes('/')) return true;
     else return false;
+}
+
+function decimalToFraction(number) {
+
+    let fraction;
+    let decimalPlaces = 0;
+    let decimalPart = 0;
+    let intPart = 0;
+    decimalPlaces = number.toString().split('.')[1].length;
+    decimalPart = number.toString().split('.')[1];
+    intPart = number.toString().split('.')[0];
+    if (intPart == 0) intPart = '';
+    fraction = intPart + '' + decimalPart + '/' + Math.pow(10, decimalPlaces);
+
+    return fraction;
+}
+
+function integerToFraction(number) {
+    return number + '/1';
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
