@@ -141,12 +141,13 @@ function integralOf(expression) {
         let integralOfConst = signsOfNumbers[i] + numbers[i] + 'x';
         answer += integralOfConst;
     }
+    console.log(answer);
     answer = simplify(answer).simplifiedFractional;
 
     return answer.toString().replace(/\s/g, '');
 }
 
-console.log(integralOf('8x^3 - 4x^3'));
+
 //
 //LOW-LEVEL EXTRACTORS HELPERS
 //
@@ -292,7 +293,31 @@ function getExpressionInDecimals(expression) {
     }
 
 
+
     return expression;
+}
+
+function fractionToDecimal(numerator, denominator) {
+
+    numerator = Number(numerator);
+    denominator = Number(denominator);
+    let remainder = '';
+    let maxNumberOfDecimalPlaces = 10;
+    let decimalValue;
+    let firstTime = true;
+    while (numerator != 0 && maxNumberOfDecimalPlaces >= 0) {
+
+        remainder = Math.trunc(numerator/denominator);
+        if (firstTime) {
+            if (remainder*denominator == numerator) return (numerator/denominator).toString();
+            decimalValue = remainder + '.';
+            firstTime = false;
+        } else decimalValue += remainder.toString();
+        numerator = (numerator - remainder * denominator) * 10;
+        maxNumberOfDecimalPlaces--;
+    }
+
+    return decimalValue;
 }
 
 function getExpressionInFractions(expression) {
@@ -310,8 +335,8 @@ function getExpressionInFractions(expression) {
 
     let newExpression = '';
     for (let i = 0; i < units.length; i++) {
-
         if (units[i].includes('x')) {
+            if (coefs[c] == 1) units[i] = '1' + units[i];
             switch(numberType(coefs[c])) {
                 case 'decimal': 
                     units[i] = signsOfCoefs[c] + units[i].replace(coefs[c], decimalToFraction(coefs[c++]));
@@ -344,7 +369,6 @@ function getExpressionInFractions(expression) {
 }
 
 function numberType(coef) {
-
     if (coef.toString().includes('.')) return 'decimal';
     if (coef.toString().includes('/')) return 'fraction';
     return 'integer';
@@ -386,7 +410,6 @@ function simplify(expression) {
 
     signsOfX = turnNullToPlus(signsOfX);
     signsOfNumbers = turnNullToPlus(signsOfNumbers);
-
     let fractional = sumUpXFractions(signsOfX, coefsOfX, powersOfX) + sumUpNumbers(numbers, signsOfNumbers);
     let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX)) + simplifyFractions(sumUpNumbers(numbers, signsOfNumbers));
     if (simplifiedFractional.includes('NaN')) {
@@ -497,18 +520,17 @@ function sumUpSamePowersFractions(signsOfXFractions, coefsOfFractions, powersOfF
             );
 
             finalSign = sumedUpFractionObj.signOfFraction;
-            finalCoef = sumedUpFractionObj.fraction;
+            if (sumedUpFractionObj.fraction != '') {
+                finalCoef = sumedUpFractionObj.fraction;
+            } else finalCoef = '0/1';
         }
 
-        if (finalCoef == '') return {
-            "simplified": '',
-            "samePowersPositions": samePowersPositions
-        };
+        if (finalCoef == '') continue;
 
         if (reg.exec(finalCoef)[1] != 0) {
 
+            if (finalSign == '-' && (reg.exec(finalCoef)[1] != reg.exec(finalCoef)[2])) finalSign = '';
             if (reg.exec(finalCoef)[1] == reg.exec(finalCoef)[2]) finalCoef = '';
-            if (finalSign == '-') finalSign = '';
 
             if (powers[i] == 1) {
                 simplified += finalSign + finalCoef + 'x';
@@ -532,9 +554,10 @@ function sumUpXFractions(signsOfXFractional, coefsOfXFractional, powersOfXFracti
     for (let i = 0; i < singleCoefsPositions.length; i++) {
         positionNumber = singleCoefsPositions[i];
         if (powersOfXFractional[positionNumber] == 1) {
+            if (simplifyFractions(coefsOfXFractional[positionNumber]) == 1) coefsOfXFractional[positionNumber] = '';
             simplified += signsOfXFractional[positionNumber] + coefsOfXFractional[positionNumber] + 'x';
         } else {
-            if (coefsOfXFractional[positionNumber] == 1) coefsOfXFractional[positionNumber] = '';
+            if (simplifyFractions(coefsOfXFractional[positionNumber]) == 1) coefsOfXFractional[positionNumber] = '';
             simplified += signsOfXFractional[positionNumber] + coefsOfXFractional[positionNumber] + 'x^' + powersOfXFractional[positionNumber];
         }
     }
