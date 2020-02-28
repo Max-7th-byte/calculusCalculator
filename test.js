@@ -59,7 +59,7 @@ function derive(expression) {
     return derivedExpression.replace(/^\+/, '');
 }
 
-console.log(simplify('0.5x - 0.5x + 123x^123 - 123x^123').simplifiedFractional);
+console.log(derivativeOf('1/2x^2'));
 
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
@@ -292,6 +292,9 @@ function getExpressionInDecimals(expression) {
     return expression;
 }
 
+function getExpressionInFractionsNew(expression) {
+    const units = expression.split(/\s*\+\s*|\s*-\s*/);
+}
 
 function getExpressionInFractions(expression) { 
     // processing decimals
@@ -335,10 +338,12 @@ function getExpressionInFractions(expression) {
                 units[i] = signs[c] + units[i].toString().replace(coefs[c++], fractionalCoef);
             } else units[i] = signs[c++] + units[i];
         } else {
-            if (numberIsInteger(numbers[n])) {
-                fractionalNumber = numbers[n] + '/1';
-                units[i] = signsOfNumbers[n] + units[i].toString().replace(numbers[n++], fractionalNumber);
-            } else units[i] = signsOfNumbers[n++] + units[i];
+            if (numbers.length != 0) {
+                if (numberIsInteger(numbers[n])) {
+                    fractionalNumber = numbers[n] + '/1';
+                    units[i] = signsOfNumbers[n] + units[i].toString().replace(numbers[n++], fractionalNumber);
+                } else units[i] = signsOfNumbers[n++] + units[i];
+            }   
         }
         newExpression += units[i];
     }
