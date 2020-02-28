@@ -59,7 +59,7 @@ function derive(expression) {
     return derivedExpression.replace(/^\+/, '');
 }
 
-
+console.log(integralOf('24x^2 - 40x^2 + 2x^3'));
 
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12) 
@@ -141,6 +141,8 @@ function integralOf(expression) {
         let integralOfConst = signsOfNumbers[i] + numbers[i] + 'x';
         answer += integralOfConst;
     }
+
+    answer = simplify(answer).simplifiedFractional;
 
     return answer.toString().replace(/\s/g, '');
 }
@@ -652,8 +654,8 @@ function multiplyFractions(signf1, f1, signf2, f2) {
 
     const reg = /(\d+)\/(\d+)/;
 
-    if (coefIsInteger(f1)) f1 = f1 + '/1';
-    if (coefIsInteger(f2)) f2 = f2 + '/1';
+    if (numberType(f1) == 'integer') f1 = f1 + '/1';
+    if (numberType(f2) == 'integer') f2 = f2 + '/1';
     let numAndDenomf1 = reg.exec(f1);
     let num1 = Number(numAndDenomf1[1]);
     let denom1 = Number(numAndDenomf1[2]);
