@@ -295,6 +295,7 @@ function getExpressionInDecimals(expression) {
 function getExpressionInFractionsNew(expression) {
 
     const units = expression.split(/\s*\+\s*|\s*-\s*/);
+    if (units[0] == '') units.splice(0,1);
 
     const coefs = getPolynomialWithX(expression).cObj.coef;
     const signsOfCoefs = getPolynomialWithX(expression).sObj.signs;
@@ -310,7 +311,7 @@ function getExpressionInFractionsNew(expression) {
         if (units[i].includes('x')) {
             switch(numberType(coefs[c])) {
                 case 'decimal': 
-                    units[i] = signsOfCoefs[c] + decimalToFraction(coefs[c++]);
+                    units[i] = signsOfCoefs[c] + units[i].replace(coefs[c], decimalToFraction(coefs[c++]));
                     break;
                 case 'integer':
                     units[i] = signsOfCoefs[c] + units[i].replace(coefs[c], integerToFraction(coefs[c++]));
@@ -328,7 +329,7 @@ function getExpressionInFractionsNew(expression) {
                     units[i] = singsOfNumbers[n] + integerToFraction(numbers[n++]);
                     break;
                 case 'fraction':
-                    units[i] = singsOfNumbers[c] + units[i];
+                    units[i] = singsOfNumbers[n] + units[i];
                     break;
             }
         }
@@ -337,62 +338,6 @@ function getExpressionInFractionsNew(expression) {
     }
 
     return newExpression;
-}
-
-console.log(getExpressionInFractionsNew('-2x'));
-
-function getExpressionInFractions(expression) { 
-    // processing decimals
-    const reg = /\d+\.\d+/g;
-
-    let match;
-    let decimalNumbers = [];
-    let DN = 0;
-    while ((match = reg.exec(expression)) != null) {
-         decimalNumbers[DN++] = match;
-    }
-
-    let decimalPlaces = 0;
-    let decimalPart = 0;
-    let intPart = 0;
-    let fractions = [];
-    for (let i = 0; i < decimalNumbers.length; i++) {
-            decimalPlaces = decimalNumbers[i].toString().split('.')[1].length;
-            decimalPart = decimalNumbers[i].toString().split('.')[1];
-            intPart = decimalNumbers[i].toString().split('.')[0];
-            if (intPart == 0) intPart = '';
-            fractions[i] = intPart + '' + decimalPart + '/' + Math.pow(10, decimalPlaces);
-
-        expression = expression.replace(decimalNumbers[i], fractions[i]);
-    }
-    //processing integer coefs
-    const coefs = getPolynomialWithX(expression).cObj.coef;
-    let c = 0;
-    const signs = getPolynomialWithX(expression).sObj.signs;
-    const signsOfNumbers = getNumbers((expression)).sObj.signs;
-    const numbers = getNumbers(expression).nObj.numbers;
-    let n = 0;
-    let fractionalCoef;
-    let fractionalNumber;
-    let units = expression.toString().split(/\s*\+\s*|\s*-\s*/);
-    let newExpression = '';
-    for (let i = 0; i < units.length; i++) {
-        if (units[i].toString().includes('x')) {
-            if (coefIsInteger(coefs[c])) {
-                fractionalCoef = coefs[c] + '/1';
-                units[i] = signs[c] + units[i].toString().replace(coefs[c++], fractionalCoef);
-            } else units[i] = signs[c++] + units[i];
-        } else {
-            if (numbers.length != 0) {
-                if (numberIsInteger(numbers[n])) {
-                    fractionalNumber = numbers[n] + '/1';
-                    units[i] = signsOfNumbers[n] + units[i].toString().replace(numbers[n++], fractionalNumber);
-                } else units[i] = signsOfNumbers[n++] + units[i];
-            }   
-        }
-        newExpression += units[i];
-    }
-    return newExpression.replace(/^\+/, '');
 }
 
 function numberType(coef) {
