@@ -55,6 +55,7 @@ function derive(expression) {
     for (let i = 0; i < derivedExpressionArray.length; i++) {
         derivedExpression += derivedExpressionArray[i];
     }
+
     derivedExpression = simplify(derivedExpression).simplifiedFractional;
 
     return derivedExpression.replace(/^\+/, '');
@@ -85,10 +86,16 @@ function calculate(expression, value) {
     for (let i = 0; i < coefsOfX.length; i++) {
         units[i] = multiplyFractions(signsOfX[i], coefsOfX[i], '+', Math.pow(value, powersOfX[i]));
     }
-
+    
     let finalSign = signsOfX[0];
     let finalCoef = units[0];
-    for (let i = 1; i < coefsOfX.length; i++) {
+    let finalCoefIsNotZero = true;
+    if (finalSign == undefined) {
+        finalSign = '+';
+        finalCoef = '0/1';
+        finalCoefIsNotZero = false;
+    }
+    for (let i = 1; i < coefsOfX.length && finalCoefIsNotZero; i++) {
         let sumedUpFractionObj = sumFractions(
             finalSign, 
             finalCoef, 
@@ -100,11 +107,20 @@ function calculate(expression, value) {
             finalCoef = sumedUpFractionObj.fraction;
         } else finalCoef = '0/1';
     }
+
+    if (finalCoef == null && numbers.length == 0) {
+        return '';
+    }
+
+    if (numbers.length == 0) {
+        if (finalSign == '-') finalSign = '';
+        answer = finalSign + finalCoef;
+        answer = simplifyFractions(answer);
+        return answer.replace(/^\+/, '');
+    }
     
-    if (finalCoef == null) return '';
-    answer = finalSign + finalCoef;
-    if (numbers.length == 0) return answer;
     answer = sumFractions(finalSign, finalCoef, signsOfNumbers[0], numbers[0]).fraction;
+    answer = simplifyFractions(answer);
 
     return answer;
 }
@@ -153,7 +169,6 @@ function integralOf(expression) {
 
     return answer.toString().replace(/\s/g, '');
 }
-
 
 //
 //LOW-LEVEL EXTRACTORS HELPERS
@@ -886,7 +901,7 @@ function processExpressionForCompare(expression) {
 }
 
 
-console.log(compareCalculations('40/4 + 1 - 1', '4x^2 - 6', '2'))
+
 
 const _derivativeOf = derivativeOf;
 export { _derivativeOf as derivativeOf };
