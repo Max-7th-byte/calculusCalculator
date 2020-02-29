@@ -134,7 +134,7 @@ function derive(expression) {
 
 function calculate(expression, value) {
 
-    let fractionalExpression = simplify(getExpressionInFractions(expression)).simplifiedFractional;
+    let fractionalExpression = getExpressionInFractions(expression);
     let xExtractor = getPolynomialWithX(fractionalExpression);
     let signsOfX = xExtractor.sObj.signs; 
     let coefsOfX = xExtractor.cObj.coef;
@@ -145,7 +145,7 @@ function calculate(expression, value) {
     let signsOfNumbers = numberExtractor.sObj.signs; 
     signsOfNumbers = turnNullToPlus(signsOfNumbers);
 
-    let answer = 0;
+    let answer;
     let units = [];
 
     for (let i = 0; i < coefsOfX.length; i++) {
@@ -159,21 +159,21 @@ function calculate(expression, value) {
             finalSign, 
             finalCoef, 
             signsOfX[i], 
-            coefsOfX[i]
+            units[i]
         );
-
         finalSign = sumedUpFractionObj.signOfFraction;
         if (sumedUpFractionObj.fraction != '') {
             finalCoef = sumedUpFractionObj.fraction;
         } else finalCoef = '0/1';
     }
-
-    answer = Number(finalSign + finalCoef) + Number(signsOfNumbers[0] + numbers[0]);
+    
+    if (finalCoef == null) return '';
+    answer = finalSign + finalCoef;
+    if (numbers.length == 0) return answer;
+    answer = sumFractions(finalSign, finalCoef, signsOfNumbers[0], numbers[0]).fraction;
 
     return answer;
 }
-
-console.log(calculate('4x^2 - 3x^2 + 2', '2'));
 
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12)
@@ -383,7 +383,7 @@ function getExpressionInDecimals(expression) {
                     units[i] = singsOfNumbers[n] + numbers[n++];
                     break;
                 case 'fraction':
-                    units[i] = singsOfNumbers[n++] + units[i].replace(numbers[n], fractionToDecimal(numbers[n++]));
+                    units[i] = singsOfNumbers[n] + units[i].replace(numbers[n], fractionToDecimal(numbers[n++]));
                     break;
             }
         }
