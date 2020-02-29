@@ -125,11 +125,6 @@ function calculate(expression, value) {
     return answer;
 }
 
-console.log(compareCalculations(calculate('1/3x^3-12x', '1'), '1/3x^3-12x' , '1'))
-
-console.log(calculate('1/3x^3-12x', '1'));
-
-console.log(derivativeOf('4/5x^3'))
 /**
  * Takes an expression written in such a way: (x^2 + 4x^4 - 12)
  * and looks for x's with a power and ordinary numbers through out two
