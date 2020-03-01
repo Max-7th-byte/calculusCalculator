@@ -475,9 +475,9 @@ function simplify(expression) {
     let numbersExpression = getNumbers(fractionalExpression);
     let numbers = numbersExpression.nObj.numbers;
     let signsOfNumbers = numbersExpression.sObj.signs;
-
     signsOfX = turnNullToPlus(signsOfX);
     signsOfNumbers = turnNullToPlus(signsOfNumbers);
+
     let simplifiedFractional = simplifyFractions(sumUpXFractions(signsOfX, coefsOfX, powersOfX)) + simplifyFractions(sumUpNumbers(numbers, signsOfNumbers));
     if (simplifiedFractional.includes('NaN')) {
         simplifiedFractional = '';
@@ -648,7 +648,7 @@ function sumUpNumbers(numbers, signsOfNumbers) {
         finalNumber = sumedUpFractionObj.fraction;
     }
 
-    if (finalSign == '-') finalSign = '';
+    if (finalSign == '-' && finalNumber.includes('-')) finalSign = '';
 
     return finalSign + finalNumber;
 }
@@ -793,17 +793,21 @@ function compareDerivatives(userAnswer, func) {
 }
 
 function compareCalculations(userAnswer, func, value) {
+
     const correctCalculation = simplify(calculate(func, value));
     const correctCalculationFractional = correctCalculation.simplifiedFractional;
     const correctCalculationDecimal = correctCalculation.simplifiedDecimal;
     const userAnswerSimplified = simplify(userAnswer);
     const userAnswerFractional = userAnswerSimplified.simplifiedFractional;
     const userAnswerDecimal = userAnswerSimplified.simplifiedDecimal;
+
     if (correctCalculationDecimal == userAnswerDecimal ||
         correctCalculationFractional == userAnswerFractional) {
         return true;
     } else return false;
 }
+
+console.log(compareCalculations('32/20-8', '1/20x^5-2x^2', '2'))
 
 function compareIntegrals(userAnswer, func) {
     const correctIntegral = integralOf(func);
