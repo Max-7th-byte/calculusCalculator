@@ -320,9 +320,7 @@ function randomFunction() {
         toReturn[TR++] = array[i];
       }
     }
-    console.log(array.length + "|" + toReturn.length);
+  
     return toReturn;
   }
 
-  console.log(cleanRandomFunctionArray());
-  
