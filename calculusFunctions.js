@@ -100,10 +100,13 @@ function calculate(expression, value) {
         finalSign = sumedUpFractionObj.signOfFraction;
         if (sumedUpFractionObj.fraction != '') {
             finalCoef = sumedUpFractionObj.fraction;
-        } else finalCoef = '0/1';
+        } else {
+            finalCoef = '0/1';
+        }
+
     }
     
-    if (finalCoef == null && numbers.length == 0) {
+    if ((finalCoef == null  || finalCoef == '0/1') && numbers.length == 0) {
         return '0';
     }
 
@@ -906,6 +909,7 @@ function processExpressionForCompare(expression) {
     return xExpression;
 }
 
+console.log(calculate('1/2x^2-3x', '6'));
 
 const _derivativeOf = derivativeOf;
 export {
